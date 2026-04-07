@@ -133,7 +133,7 @@ The following AAC principles have no direct equivalent in CSA ATF, OWASP Agentic
 
 ## Citation
 
-> Thakuri, R. (2026). *The Autonomous Agentic Covenant: A Governance Framework for Autonomous and AI-Driven Systems* (Version 1.3). CC BY 4.0. https://github.com/[your-username]/autonomous-agentic-covenant
+> Thakuri, R. (2026). *The Autonomous Agentic Covenant: A Governance Framework for Autonomous and AI-Driven Systems* (Version 1.3). CC BY 4.0. https://github.com/raj-thakuri/autonomous-agentic-covenant
 
 ---
 
