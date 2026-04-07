@@ -9,7 +9,7 @@
 
 ## What Is the AAC?
 
-The Autonomous Agentic Covenant is an engineering governance framework for teams designing, building, and deploying autonomous and AI-driven systems. It defines 69 principles across 11 domains — from Zero-Trust security and data privacy to agent trust graduation and runtime decision arbitration — providing stable, citable control identifiers that work in design reviews, implementation tickets, CI/CD policy gates, and compliance audits.
+The Autonomous Agentic Covenant is an open engineering governance framework for teams designing, building, and deploying autonomous and AI-driven systems. It defines 69 principles across 11 domains — from Zero-Trust security and data privacy to agent trust graduation and runtime decision arbitration — providing stable, citable control identifiers that work in design reviews, implementation tickets, CI/CD policy gates, and compliance audits.
 
 The AAC is not a compliance checklist. It is a decision-making framework: when design choices present competing valid options, the relevant AAC domain governs. When domains conflict, **AAC-DNH-0 (Do No Harm)** governs.
 
@@ -149,6 +149,6 @@ If you contribute code (policy gate scripts, validators, test harnesses) to this
 
 ## Author
 
-**Raj Thakuri** — CISO, independent researcher, and practitioner at the intersection of AI security, privacy-first architecture, and AI governance. This framework was developed from operational experience designing governance structures for agentic AI systems in regulated enterprise environments.
+**Raj Thakuri** — CISO, independent researcher, and practitioner at the intersection of AI security, privacy-first architecture, and AI governance. This framework was developed from operational experience designing governance structures for agentic AI systems in regulated enterprise environments. All views are my own.
 
 *Questions, citations, and implementation reports welcome via GitHub Issues.*
