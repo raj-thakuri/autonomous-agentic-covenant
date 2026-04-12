@@ -40,7 +40,8 @@ autonomous-agentic-covenant/
 ├── profiles/
 │   └── AAC_Implementation_Profile_v1.0.docx  ← deployment template
 ├── crosswalk/
-│   └── AAC_Framework_Crosswalk_v1.0.docx     ← CSA ATF / OWASP / NIST mapping
+│   ├── AAC_Framework_Crosswalk_v1.0.docx     ← CSA ATF / OWASP / NIST mapping
+│   └── AAC_ATLAS_Crosswalk_v1.0.docx         ← MITRE ATLAS threat mitigation mapping
 └── governance/
     └── CONTRIBUTING.md               ← contribution process
 ```
@@ -49,7 +50,7 @@ autonomous-agentic-covenant/
 
 **`profiles/`** — The Implementation Profile template. Every AAC deployment requires a completed profile that declares context-specific parameters: harm tier definitions, agent trust tiers, confidence thresholds, resource boundaries, and safe mode criteria. Without a profile, several AAC principles cannot be verified.
 
-**`crosswalk/`** — Framework alignment document mapping every AAC control to CSA Agentic Trust Framework (ATF), OWASP Agentic Top 10 (2026), and NIST AI RMF 1.0. Use this to justify AAC adoption to teams already operating under these frameworks, or to conduct gap analysis against existing compliance obligations.
+**`crosswalk/`** — Two crosswalk documents covering different instruments. The Framework Crosswalk maps every AAC control to CSA ATF, OWASP Agentic Top 10, and NIST AI RMF 1.0 — a governance-to-governance alignment exercise. The ATLAS Crosswalk is structured differently: it maps AAC controls to MITRE ATLAS adversarial techniques, identifying which controls mitigate which attack vectors. Use the Framework Crosswalk to justify AAC adoption against existing compliance obligations; use the ATLAS Crosswalk for threat modeling and red team scope definition.
 
 **`governance/`** — Contribution process for proposing changes to the framework.
 
@@ -67,13 +68,17 @@ Download and complete [`profiles/AAC_Implementation_Profile_v1.0.docx`](profiles
 
 ### Path 3 — Map to your existing frameworks
 
-Open [`crosswalk/AAC_Framework_Crosswalk_v1.0.docx`](crosswalk/AAC_Framework_Crosswalk_v1.0.docx). The crosswalk covers:
+The `crosswalk/` directory contains two documents serving distinct purposes:
+
+**Governance alignment** — Open [`crosswalk/AAC_Framework_Crosswalk_v1.0.docx`](crosswalk/AAC_Framework_Crosswalk_v1.0.docx) to map AAC controls to peer governance frameworks:
 
 | Framework | Coverage |
 |---|---|
 | CSA Agentic Trust Framework (ATF) | 27 Full · 18 Partial · 11 Gap |
 | OWASP Agentic Top 10 (2026) | 9/10 Full · 1 Partial |
 | NIST AI RMF 1.0 | 18 Full · 5 Partial · 1 Gap |
+
+**Threat modeling** — Open [`crosswalk/AAC_ATLAS_Crosswalk_v1.0.docx`](crosswalk/AAC_ATLAS_Crosswalk_v1.0.docx) to map AAC controls to MITRE ATLAS v5.4.0 adversarial techniques. This crosswalk is structured differently from the governance alignment document — it identifies which AAC controls mitigate which attack vectors across all 16 ATLAS tactics, and is designed for use in threat modeling exercises and red team scope definition. Coverage ratings reflect defensive effectiveness, not conceptual alignment.
 
 ---
 
