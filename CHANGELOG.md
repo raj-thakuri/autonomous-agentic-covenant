@@ -6,6 +6,18 @@ Control identifiers are stable within a major version. Additions use new numbers
 
 ---
 
+## Added AAC v2.0 Schema and one sample instance
+
+Added AAC v2.0 JSON Schema and one sample instance.
+
+---
+
+## Uploaded DRAFT AAc v2.0.
+
+Uploaded draft AAC v2.0
+
+---
+
 ## Updated License  — April 2026
 
 Updated license to **Apache 2.0** for enterprise/standardization alignment.
