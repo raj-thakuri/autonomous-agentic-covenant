@@ -10,10 +10,14 @@ Version 1.3 · April 2026 · Prepared by Raj Thakuri
 
 ## License & Attribution
 
-This work is licensed under the [Creative Commons Attribution 4.0 International License (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/). You are free to share and adapt this material for any purpose, including commercially, provided you give appropriate credit.
+Copyright 2026 Raj Thakuri
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at: http://www.apache.org/licenses/LICENSE-2.0
 
 **Attribution format:**
-> Thakuri, R. (2026). *The Autonomous Agentic Covenant: A Governance Framework for Autonomous and AI-Driven Systems* (Version 1.3). CC BY 4.0. https://creativecommons.org/licenses/by/4.0/
+> Thakuri, R. (2026). *The Autonomous Agentic Covenant: A Governance Framework for Autonomous and AI-Driven Systems* (Version 1.3). Apache 2.0. http://www.apache.org/licenses/LICENSE-2.0. Available at: https://github.com/raj-thakuri/autonomous-agentic-covenant
 
 ---
 
@@ -432,6 +436,6 @@ When domains conflict, **AAC-DNH-0 (Do No Harm)** governs. Runtime resolution of
 
 ## Citation
 
-> Thakuri, R. (2026). *The Autonomous Agentic Covenant: A Governance Framework for Autonomous and AI-Driven Systems* (Version 1.3). Licensed under CC BY 4.0.
+> Thakuri, R. (2026). *The Autonomous Agentic Covenant: A Governance Framework for Autonomous and AI-Driven Systems* (Version 1.3). Licensed under Apache 2.0.
 >
 > Version 1.3 · April 2026 · 69 numbered principles + 9 foundational directives · 78 control identifiers · 11 domains.
