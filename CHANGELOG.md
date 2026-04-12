@@ -8,7 +8,7 @@ Control identifiers are stable within a major version. Additions use new numbers
 
 ## Companion Documents — April 2026
 
-**AAC MITRE ATLAS Threat Mitigation Crosswalk v1.0** — New companion document published alongside the framework. Maps AAC v1.3 controls to MITRE ATLAS v5.4.0 (16 tactics · 84 techniques · 56 sub-techniques). Structured differently from the governance crosswalk: coverage ratings reflect defensive effectiveness against adversarial techniques, not conceptual alignment with peer frameworks. Covers 30 technique mappings across all 16 ATLAS tactics. Identifies five gap areas — dynamic supply chain integrity (highest priority), model artifact recovery, output content integrity monitoring, adversarial benchmark specification, and passive OSINT reconnaissance — with recommended closure paths. Located at `crosswalk/AAC_ATLAS_Crosswalk_v1.0.docx`.
+**AAC MITRE ATLAS Threat Mitigation Crosswalk v1.0** — New companion document published alongside the framework. Maps AAC v1.3 controls to MITRE ATLAS v5.4.0 (16 tactics · 84 techniques · 56 sub-techniques). Structured differently from the governance crosswalk: coverage ratings reflect defensive effectiveness against adversarial techniques, not conceptual alignment with peer frameworks. Covers 30 technique mappings across all 16 ATLAS tactics. Located at `crosswalk/AAC_ATLAS_Crosswalk_v1.0.docx`.
 
 **Note on crosswalk scope:** The ATLAS crosswalk is a threat modeling instrument, not a governance alignment document. The two crosswalk documents in the `crosswalk/` directory serve distinct purposes and should be used accordingly. See README for guidance.
 
