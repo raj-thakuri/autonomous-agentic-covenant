@@ -1,0 +1,109 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://autonomous-agentic-covenant.org/schemas/v2/covenant.json",
+  "title": "AAC v2.0 Control Plane Specification",
+  "type": "object",
+  "required": [
+    "version",
+    "metadata",
+    "authority_registry",
+    "enforcement_gates",
+    "context_interface_contract"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "enum": ["2.0"]
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["system_id", "implementation_pattern"],
+      "properties": {
+        "system_id": { "type": "string" },
+        "compliance_targets": {
+          "type": "array",
+          "items": { 
+            "type": "string",
+            "enum": ["EU_AI_ACT", "NIST_RMF", "ISO_42001", "OWASP_LLM"] 
+          }
+        },
+        "implementation_pattern": { 
+          "type": "string",
+          "enum": ["SIDECAR", "INLINE", "OVERLAY", "HYBRID"] 
+        }
+      }
+    },
+    "authority_registry": {
+      "type": "object",
+      "required": ["principals"],
+      "properties": {
+        "principals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "role", "auth_method"],
+            "properties": {
+              "id": { "type": "string" },
+              "role": { 
+                "type": "string",
+                "enum": ["SOVEREIGN_OVERRIDE", "AUDITOR", "SYSTEM_OWNER"] 
+              },
+              "auth_method": { 
+                "type": "string",
+                "enum": ["MTLS", "SIGNATURE_ED25519", "OIDC"] 
+              }
+            }
+          }
+        }
+      }
+    },
+    "enforcement_gates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["control_id", "target_action", "disposition"],
+        "properties": {
+          "control_id": { 
+            "type": "string", 
+            "pattern": "^AAC-[A-Z]{2}-[0-9]{2}$" 
+          },
+          "target_action": { "type": "string" },
+          "disposition": { 
+            "type": "string",
+            "enum": ["ALLOW", "DENY", "ESCALATE"] 
+          },
+          "min_assurance_level": { "type": "integer", "minimum": 1, "maximum": 5 },
+          "integrity_check": { "type": "boolean", "default": false },
+          "escalation_path": { "type": "string" }
+        }
+      }
+    },
+    "context_interface_contract": {
+      "type": "object",
+      "required": ["allowed_sources"],
+      "properties": {
+        "default_assurance_floor": { "type": "integer", "default": 1 },
+        "allowed_sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["source_id", "assurance_level"],
+            "properties": {
+              "source_id": { "type": "string" },
+              "source_type": { 
+                "type": "string",
+                "enum": ["LOCAL", "RAG", "VECTOR_DB", "SOVEREIGN_PCP"] 
+              },
+              "assurance_level": { "type": "integer", "minimum": 1, "maximum": 5 },
+              "isolation_attestation": { "type": "boolean", "default": false },
+              "provenance_structure": { 
+                "type": "string",
+                "enum": ["NONE", "SIGNED_MANIFEST", "ZK_PROOF"] 
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
