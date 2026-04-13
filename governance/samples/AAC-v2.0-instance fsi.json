@@ -1,0 +1,402 @@
+{
+  "$schema": "https://autonomous-agentic-covenant.org/schemas/v2.0/covenant.json",
+
+  "_comment": "AAC v2.0 Sample Instance — Financial Services Analytics Agent. Deployment: Microsoft Agent Governance Toolkit (Agent OS) as sidecar on AKS, governing a LangGraph agent runtime. Agent OS intercepts at the LangGraph node execution boundary over localhost. This instance is a reference configuration for an MVP deployment — not a production-hardened artifact. See AAC_v2.0_DRAFT.md for governing principles.",
+
+  "version": "2.0",
+
+  "metadata": {
+    "system_id": "fsi-analytics-agent-mvp-001",
+    "framework_version": "2.0",
+    "implementation_pattern": "SIDECAR",
+    "compliance_targets": ["NIST_RMF", "OWASP_LLM"],
+
+    "agent_identity": {
+      "agent_id": "did:aac:fsi-analytics-agent-mvp-001",
+      "trust_tier": "TIER_2",
+      "control_plane_id": "agent-os-sidecar-aks-pod-fsi-001"
+    },
+
+    "artifact_validity": {
+      "issued_at": "2026-04-12T00:00:00Z",
+      "expires_at": "2026-07-12T00:00:00Z",
+      "revision_authority": "principal-ciso-001"
+    }
+  },
+
+  "harm_classification": {
+    "_comment": "Financial services harm taxonomy. Tier definitions are context-specific per AAC-DA-59. Declared before deployment and referenced by every enforcement gate.",
+    "tier_definitions": [
+      {
+        "tier": 1,
+        "label": "IRREVERSIBLE",
+        "description": "Permanent, unrecoverable harm. Requires immediate system halt and escalation.",
+        "categories": [
+          "unauthorized_fund_transfer",
+          "account_takeover_or_credential_compromise",
+          "pii_or_pci_data_breach",
+          "regulatory_violation_with_punitive_consequence",
+          "irreversible_position_liquidation"
+        ]
+      },
+      {
+        "tier": 2,
+        "label": "MATERIAL",
+        "description": "Significant but recoverable harm. Requires human approval before action proceeds.",
+        "categories": [
+          "incorrect_automated_trade_recommendation",
+          "unauthorized_account_parameter_modification",
+          "transaction_requiring_reversal",
+          "incorrect_risk_score_affecting_credit_decision",
+          "disclosure_of_non-public_financial_information"
+        ]
+      },
+      {
+        "tier": 3,
+        "label": "FRICTION",
+        "description": "Transient, recoverable impact. Logged and monitored but does not block action.",
+        "categories": [
+          "query_response_latency",
+          "low_confidence_data_retrieval",
+          "report_generation_delay",
+          "explainability_gap_in_summary",
+          "suboptimal_context_source_selection"
+        ]
+      }
+    ],
+    "tradeoff_rule": "MINIMIZE_TIER"
+  },
+
+  "authority_registry": {
+    "_comment": "Three principals forming a non-circular accountability chain per AAC-OG-28. Principal-002 (Agent Compliance service) is a verified governance system — not human — demonstrating the authority-neutral core design.",
+    "principals": [
+      {
+        "id": "principal-ciso-001",
+        "role": "SOVEREIGN_OVERRIDE",
+        "scope": ["OVERRIDE", "TIER_ASSIGNMENT", "ARTIFACT_REVISION"],
+        "auth_method": "OIDC",
+        "established_by": "governance-initialization-process",
+        "revocation_conditions": "Role change, departure, or security incident involving this identity",
+        "superseded_by": null
+      },
+      {
+        "id": "principal-agent-compliance-svc-001",
+        "role": "TIER_ASSIGNMENT",
+        "_comment": "Microsoft Agent Governance Toolkit — Agent Compliance package. Verified governance system acting as an authorized principal for trust tier assignment and audit per AAC-OG-28. Satisfies the auditability and consistency requirements of AAC-DA-60.",
+        "scope": ["TIER_ASSIGNMENT", "AUDIT"],
+        "auth_method": "SIGNATURE_ED25519",
+        "established_by": "principal-ciso-001",
+        "revocation_conditions": "Toolkit version deprecation, integrity verification failure, or CISO revocation",
+        "superseded_by": "principal-ciso-001"
+      },
+      {
+        "id": "principal-secops-lead-001",
+        "role": "ESCALATION_TERMINAL",
+        "scope": ["ESCALATION_TERMINAL", "AUDIT"],
+        "auth_method": "OIDC",
+        "established_by": "principal-ciso-001",
+        "revocation_conditions": "Role change or departure",
+        "superseded_by": "principal-ciso-001"
+      }
+    ]
+  },
+
+  "fallback_registry": [
+    {
+      "id": "fallback-deny-and-log",
+      "action": "DENY_ACTION_LOG_VIOLATION",
+      "applicable_harm_tiers": ["IRREVERSIBLE", "MATERIAL"],
+      "safe_by_construction_rationale": "Action is not executed. A structured denial record is written to the audit log with the harm tier, triggering control ID, and timestamp. No side effects. System state is unchanged."
+    },
+    {
+      "id": "fallback-queue-human-review",
+      "action": "SUSPEND_AND_QUEUE_FOR_REVIEW",
+      "applicable_harm_tiers": ["MATERIAL"],
+      "safe_by_construction_rationale": "Action is suspended, not cancelled. A review ticket is created in the governance queue with full action context. The requesting agent is notified of suspension. No financial state is modified pending review."
+    },
+    {
+      "id": "fallback-safe-read-response",
+      "action": "RETURN_CACHED_SAFE_RESPONSE",
+      "applicable_harm_tiers": ["FRICTION"],
+      "safe_by_construction_rationale": "Returns a cached, previously validated read response or a structured 'data unavailable' message. No write operations. Appropriate for read-only retrieval actions when confidence or assurance thresholds are not met."
+    },
+    {
+      "id": "fallback-transaction-reversal",
+      "action": "INITIATE_REVERSAL_WORKFLOW",
+      "applicable_harm_tiers": ["MATERIAL"],
+      "safe_by_construction_rationale": "Triggers the declared transaction reversal workflow for any partially committed financial action. Per AAC-DA-61 recovery requirement: denied or failed Tier 2 actions must be recoverable. Reversal is idempotent and logged."
+    }
+  ],
+
+  "system_constraints": {
+    "max_chain_depth": 3,
+    "_comment_chain_depth": "Conservative for MVP. Financial services risk profile warrants shallow agent lineage. Root agent (depth 0) may spawn one level of analysis sub-agents (depth 1) and one level of data retrieval agents (depth 2). Depth 3 requests are rejected.",
+
+    "default_latency_budget_ms": 100,
+    "_comment_latency": "Agent OS reports p99 < 0.1ms policy evaluation. The 100ms budget accounts for the full sidecar round-trip including LangGraph node interception and audit log write. Financial actions may override this per gate.",
+
+    "max_aggregate_risk_score": 0.65,
+    "_comment_risk": "Cumulative risk cap across a decision chain per AAC-DA-60 amendment. A chain of individually low-risk read operations whose aggregate produces material financial exposure is evaluated at MATERIAL tier.",
+
+    "safe_mode": {
+      "entry_thresholds": {
+        "confidence_floor": 0.60,
+        "integrity_signal_max_violations": 3,
+        "circuit_breakers_open_max": 2
+      },
+      "recovery_thresholds": {
+        "confidence_floor": 0.80,
+        "integrity_signal_max_violations": 0,
+        "circuit_breakers_open_max": 0
+      },
+      "_comment": "Entry and recovery thresholds are materially distinct per AAC-RS-39. Recovery requires clean integrity signals and zero open circuit breakers — not just confidence recovery.",
+      "min_dwell_seconds": 300,
+      "max_flap_count": 3,
+      "flap_window_seconds": 3600
+    },
+
+    "cyclical_interaction": {
+      "max_cycles": 5,
+      "window_seconds": 60,
+      "_comment": "Per AAC-AO-54 amendment. More than 5 cycles between the same agent pair within 60 seconds triggers escalation to principal-secops-lead-001 regardless of individual action arbitration outcomes."
+    },
+
+    "safety_health_kpis": {
+      "actions_denied_threshold_pct": 5.0,
+      "_comment_denied": "Sustained denial rate above 5% indicates systematic misconfiguration of harm tiers or agent behavior drift. Triggers governance review.",
+      "actions_escalated_threshold_pct": 10.0,
+      "_comment_escalated": "Sustained escalation above 10% indicates confidence threshold issues or insufficient agent autonomy calibration.",
+      "fallback_triggered_threshold_pct": 3.0,
+      "_comment_fallback": "Fallback rate above 3% in a financial services context indicates liveness constraint failures requiring immediate investigation."
+    }
+  },
+
+  "enforcement_gates": [
+
+    {
+      "_comment": "Gate 1 — Read-only customer portfolio query. Low risk. Agent OS intercepts the LangGraph retrieval node.",
+      "control_id": "AAC-ZT-65",
+      "target_action": "QUERY_CUSTOMER_PORTFOLIO",
+      "conditions": {
+        "confidence_min": 0.70,
+        "harm_tier_max": "FRICTION",
+        "required_assurance_level": 2,
+        "requires_nhi_disclosure": true
+      },
+      "disposition": "ALLOW",
+      "fallback_action": "fallback-safe-read-response",
+      "recovery_action": "fallback-safe-read-response",
+      "latency_budget_ms": 50,
+      "audit": {
+        "log_decision": true,
+        "include_reasoning": true
+      }
+    },
+
+    {
+      "_comment": "Gate 2 — Market data retrieval from external RAG source. ZT-77 supply chain gate — provenance verified before data enters context.",
+      "control_id": "AAC-ZT-77",
+      "target_action": "RETRIEVE_MARKET_DATA",
+      "conditions": {
+        "confidence_min": 0.75,
+        "harm_tier_max": "FRICTION",
+        "required_assurance_level": 2,
+        "requires_nhi_disclosure": true
+      },
+      "disposition": "ALLOW",
+      "fallback_action": "fallback-safe-read-response",
+      "recovery_action": "fallback-safe-read-response",
+      "latency_budget_ms": 75,
+      "audit": {
+        "log_decision": true,
+        "include_reasoning": true
+      }
+    },
+
+    {
+      "_comment": "Gate 3 — Risk report generation. Medium risk. Output content integrity monitoring per AAC-OG-26 applied post-generation pre-delivery.",
+      "control_id": "AAC-OG-26",
+      "target_action": "GENERATE_RISK_REPORT",
+      "conditions": {
+        "confidence_min": 0.80,
+        "harm_tier_max": "MATERIAL",
+        "required_assurance_level": 2,
+        "requires_nhi_disclosure": true
+      },
+      "disposition": "ALLOW",
+      "fallback_action": "fallback-deny-and-log",
+      "recovery_action": "fallback-safe-read-response",
+      "latency_budget_ms": 150,
+      "audit": {
+        "log_decision": true,
+        "include_reasoning": true
+      }
+    },
+
+    {
+      "_comment": "Gate 4 — Compliance report generation. Medium risk. Higher confidence threshold given regulatory context.",
+      "control_id": "AAC-DA-60",
+      "target_action": "GENERATE_COMPLIANCE_REPORT",
+      "conditions": {
+        "confidence_min": 0.85,
+        "harm_tier_max": "MATERIAL",
+        "required_assurance_level": 3,
+        "requires_nhi_disclosure": true
+      },
+      "disposition": "ALLOW",
+      "fallback_action": "fallback-deny-and-log",
+      "recovery_action": "fallback-queue-human-review",
+      "latency_budget_ms": 150,
+      "audit": {
+        "log_decision": true,
+        "include_reasoning": true
+      }
+    },
+
+    {
+      "_comment": "Gate 5 — Transaction initiation. High risk. Escalates to principal-secops-lead-001 for all cases — agent cannot self-authorize. Per AAC-DA-60 five-step sequence and AAC-AI-12 override availability.",
+      "control_id": "AAC-DA-60",
+      "target_action": "INITIATE_TRANSACTION",
+      "conditions": {
+        "confidence_min": 0.95,
+        "reversibility_max": 0.3,
+        "harm_tier_max": "MATERIAL",
+        "required_assurance_level": 3,
+        "requires_nhi_disclosure": true
+      },
+      "disposition": "ESCALATE",
+      "fallback_action": "fallback-deny-and-log",
+      "recovery_action": "fallback-transaction-reversal",
+      "latency_budget_ms": 200,
+      "escalation_path": "principal-secops-lead-001",
+      "audit": {
+        "log_decision": true,
+        "include_reasoning": true
+      }
+    },
+
+    {
+      "_comment": "Gate 6 — Fund transfer execution. Tier 1 harm surface. DNH-A hard block — no path to execution without sovereign override. Per AAC-DNH-A: no optimization objective may reclassify this action's harm tier.",
+      "control_id": "AAC-DNH-A",
+      "target_action": "EXECUTE_FUND_TRANSFER",
+      "conditions": {
+        "confidence_min": 0.99,
+        "reversibility_max": 0.1,
+        "harm_tier_max": "FRICTION",
+        "_comment": "harm_tier_max FRICTION means any MATERIAL or IRREVERSIBLE classification produces an immediate DENY. Fund transfers are classified IRREVERSIBLE by the harm taxonomy above.",
+        "required_assurance_level": 3,
+        "requires_nhi_disclosure": true
+      },
+      "disposition": "DENY",
+      "fallback_action": "fallback-deny-and-log",
+      "recovery_action": "fallback-transaction-reversal",
+      "latency_budget_ms": 50,
+      "audit": {
+        "log_decision": true,
+        "include_reasoning": true
+      }
+    },
+
+    {
+      "_comment": "Gate 7 — Account parameter modification. High risk write. Escalates unconditionally — Tier 2 harm category.",
+      "control_id": "AAC-AO-52",
+      "target_action": "MODIFY_ACCOUNT_PARAMETERS",
+      "conditions": {
+        "confidence_min": 0.90,
+        "harm_tier_max": "MATERIAL",
+        "required_assurance_level": 3,
+        "requires_nhi_disclosure": true
+      },
+      "disposition": "ESCALATE",
+      "fallback_action": "fallback-deny-and-log",
+      "recovery_action": "fallback-queue-human-review",
+      "latency_budget_ms": 200,
+      "escalation_path": "principal-secops-lead-001",
+      "audit": {
+        "log_decision": true,
+        "include_reasoning": true
+      }
+    },
+
+    {
+      "_comment": "Gate 8 — External API invocation. ZT-77 supply chain integrity gate. Ed25519 plugin signing verified by Agent OS before any external tool connection. Unsigned tools are DENIED.",
+      "control_id": "AAC-ZT-77",
+      "target_action": "INVOKE_EXTERNAL_TOOL",
+      "conditions": {
+        "required_assurance_level": 2,
+        "requires_nhi_disclosure": true
+      },
+      "disposition": "ALLOW",
+      "fallback_action": "fallback-deny-and-log",
+      "recovery_action": "fallback-deny-and-log",
+      "latency_budget_ms": 75,
+      "audit": {
+        "log_decision": true,
+        "include_reasoning": true
+      }
+    },
+
+    {
+      "_comment": "Gate 9 — Sub-agent spawn. AO-60 recursive governance gate. Depth counter verified before spawn is permitted. Spawned agents inherit covenant subset at TIER_3 (one below parent TIER_2).",
+      "control_id": "AAC-AO-60",
+      "target_action": "SPAWN_ANALYSIS_SUBAGENT",
+      "conditions": {
+        "confidence_min": 0.80,
+        "harm_tier_max": "MATERIAL",
+        "required_assurance_level": 2,
+        "requires_nhi_disclosure": true
+      },
+      "disposition": "ALLOW",
+      "fallback_action": "fallback-deny-and-log",
+      "recovery_action": "fallback-deny-and-log",
+      "latency_budget_ms": 100,
+      "audit": {
+        "log_decision": true,
+        "include_reasoning": true
+      }
+    }
+  ],
+
+  "context_interface_contract": {
+    "default_assurance_floor": 2,
+    "_comment": "Floor of 2 for financial services — local in-process memory (assurance level 1) is insufficient for this domain without additional integrity attestation.",
+
+    "allowed_sources": [
+      {
+        "source_id": "langchain-vector-store-primary",
+        "source_type": "VECTOR_DB",
+        "_comment": "Primary RAG context source. Financial document corpus — regulatory filings, market data, internal policy documents. Indexed and maintained by the data engineering team.",
+        "assurance_level": 3,
+        "provenance": {
+          "structure": "SIGNED_MANIFEST",
+          "derivation_depth": 1,
+          "confidence_decay_per_hop": 0.10,
+          "max_derivation_depth": 2
+        },
+        "isolation_attestation": true
+      },
+      {
+        "source_id": "langgraph-session-memory",
+        "source_type": "LOCAL",
+        "_comment": "In-process session state maintained by LangGraph checkpointer. Used for within-session context continuity only. Lower assurance — not used for high-risk action decisions.",
+        "assurance_level": 2,
+        "provenance": {
+          "structure": "NONE",
+          "derivation_depth": 0,
+          "confidence_decay_per_hop": 0.0,
+          "max_derivation_depth": 0
+        },
+        "isolation_attestation": false
+      }
+    ]
+  },
+
+  "agent_lineage": {
+    "_comment": "Root agent — deployed directly by governance initialization process. No parent. Depth 0. Spawned sub-agents will carry parent_id = did:aac:fsi-analytics-agent-mvp-001 and depth = 1.",
+    "parent_id": null,
+    "depth": 0,
+    "inherited_covenant_scope": "ROOT",
+    "ttl_seconds": 86400,
+    "provenance_signature": "GOVERNANCE_INITIALIZATION_ROOT"
+  }
+}
