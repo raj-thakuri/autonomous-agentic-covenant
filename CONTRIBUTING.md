@@ -44,7 +44,7 @@ If you've completed an implementation profile for a specific deployment context 
 
 ### Tooling — Apache 2.0
 
-If you're contributing code — CI/CD policy gate scripts, schema validators, test harnesses, anything executable — note that code contributions are licensed under Apache 2.0, separate from the CC BY 4.0 framework documents. Please confirm this in your PR.
+All contributions to the AAC project—including specification text, schemas, and implementation code—are licensed under the Apache License 2.0. By submitting a Pull Request, you agree to license your contribution under these terms.
 
 ---
 
