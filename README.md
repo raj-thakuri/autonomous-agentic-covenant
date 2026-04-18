@@ -67,8 +67,9 @@ autonomous-agentic-covenant/
 │   ├── aac_v2.0_schema.json                      <- JSON Schema (maturity-aware)
 │   └── aac_v2.0_instance_fsi.json                <- FSI reference instance (L1)
 ├── crosswalk/
-│   ├── AAC_Framework_Crosswalk_v1.0.docx         <- CSA ATF / OWASP / NIST mapping
-│   └── AAC_ATLAS_Crosswalk_v1.0.docx             <- MITRE ATLAS threat mitigation mapping
+│   ├── AAC_Framework_Crosswalk_v2.0.md           <- CSA ATF / OWASP / NIST mapping
+│   └── AAC_ATLAS_Crosswalk_v2.0.md               <- MITRE ATLAS threat mitigation mapping
+│   └── AAC_EU_AI_Act_Crosswalk_v2.0.md               <- MITRE ATLAS threat mitigation mapping
 └── governance/
     └── CONTRIBUTING.md                            <- contribution process
 ```
