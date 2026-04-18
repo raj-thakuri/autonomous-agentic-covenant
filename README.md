@@ -1,4 +1,3 @@
-> **Note:** AAC v2.0 is currently undergoing a structural refactor to align with 2026 engineering standards (NIST/ISO). Technical specs are being updated daily.
 
 # The Autonomous Agentic Covenant (AAC)
 
