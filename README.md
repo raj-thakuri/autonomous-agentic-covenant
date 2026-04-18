@@ -69,7 +69,7 @@ autonomous-agentic-covenant/
 ├── crosswalk/
 │   ├── AAC_Framework_Crosswalk_v2.0.md           <- CSA ATF / OWASP / NIST mapping
 │   └── AAC_ATLAS_Crosswalk_v2.0.md               <- MITRE ATLAS threat mitigation mapping
-│   └── AAC_EU_AI_Act_Crosswalk_v2.0.md               <- MITRE ATLAS threat mitigation mapping
+│   └── AAC_EU_AI_Act_Crosswalk_v2.0.md           <- EU AI Act 2026 mapping
 └── governance/
     └── CONTRIBUTING.md                            <- contribution process
 ```
