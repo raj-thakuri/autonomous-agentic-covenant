@@ -1,0 +1,601 @@
+{
+  "$schema": "https://autonomous-agentic-covenant.org/schemas/v2.0/covenant.json",
+  "_comment": "AAC v2.0 Reference Instance \u2014 Financial Services Analytics Agent, L1 Foundational. Policy engine sidecar governing a LangGraph agent runtime. Satisfies all L1 required fields only. No L2/L3 optional fields. See AAC_v2.0_DRAFT.md for governing principles.",
+  "version": "2.0",
+  "metadata": {
+    "system_id": "fsi-analytics-agent-mvp-001",
+    "framework_version": "2.0",
+    "maturity_level": "L1",
+    "implementation_pattern": "SIDECAR",
+    "implementation_profile_ref": "IP-FSI-ANALYTICS-001-v1.0",
+    "regulatory_context": [
+      "SOC_2_TYPE_II",
+      "PCI_DSS_LEVEL_1",
+      "SEC_17A4"
+    ],
+    "compliance_targets": [
+      "NIST_RMF",
+      "OWASP_AGENTIC_TOP_10",
+      "MITRE_ATLAS"
+    ],
+    "agent_identity": {
+      "agent_id": "did:aac:fsi-analytics-agent-mvp-001",
+      "trust_tier": "tier-2-standard",
+      "control_plane_id": "policy-sidecar-fsi-001"
+    },
+    "artifact_validity": {
+      "issued_at": "2026-04-14T00:00:00Z",
+      "expires_at": "2027-04-14T00:00:00Z",
+      "revision_authority": "principal-ciso-001"
+    }
+  },
+  "trust_tier_definitions": [
+    {
+      "tier_id": 0,
+      "label": "Probationary",
+      "harm_tier_ceiling": "FRICTION",
+      "permitted_action_classes": [
+        "QUERY_CUSTOMER_PORTFOLIO",
+        "RETRIEVE_MARKET_DATA"
+      ],
+      "graduation_criteria": "30 days operation; accuracy >= 0.92; zero override events; CISO sign-off",
+      "demotion_triggers": [
+        "Any override event",
+        "Accuracy < 0.88 on rolling 7-day window"
+      ],
+      "minimum_operating_period": "30 days"
+    },
+    {
+      "tier_id": 1,
+      "label": "Restricted",
+      "harm_tier_ceiling": "MATERIAL",
+      "permitted_action_classes": [
+        "QUERY_CUSTOMER_PORTFOLIO",
+        "RETRIEVE_MARKET_DATA",
+        "GENERATE_RISK_REPORT",
+        "GENERATE_COMPLIANCE_REPORT"
+      ],
+      "graduation_criteria": "60 days at Tier 1; accuracy >= 0.95; false positive rate < 0.03; zero Tier 2 violations; CISO sign-off",
+      "demotion_triggers": [
+        "False positive rate > 0.05 on rolling 7-day window",
+        "Any Tier 2 violation",
+        "More than 3 override events in 30 days"
+      ],
+      "minimum_operating_period": "60 days"
+    },
+    {
+      "tier_id": 2,
+      "label": "Standard",
+      "harm_tier_ceiling": "MATERIAL",
+      "permitted_action_classes": [
+        "QUERY_CUSTOMER_PORTFOLIO",
+        "RETRIEVE_MARKET_DATA",
+        "GENERATE_RISK_REPORT",
+        "GENERATE_COMPLIANCE_REPORT",
+        "INITIATE_TRANSACTION",
+        "MODIFY_ACCOUNT_PARAMETERS",
+        "INVOKE_EXTERNAL_TOOL",
+        "SPAWN_ANALYSIS_SUBAGENT"
+      ],
+      "graduation_criteria": "Maximum tier for this deployment",
+      "demotion_triggers": [
+        "Any Tier 1 harm event",
+        "Accuracy < 0.93 on rolling 7-day window",
+        "More than 2 override events in 30 days"
+      ]
+    }
+  ],
+  "harm_classification": {
+    "_comment": "Financial services harm taxonomy per AAC-DA-59. Pre-classified action registry enables O(1) runtime lookup.",
+    "tier_definitions": [
+      {
+        "tier": 1,
+        "label": "IRREVERSIBLE",
+        "description": "Permanent, unrecoverable harm. No remediation path once executed.",
+        "categories": [
+          "unauthorized_fund_transfer",
+          "account_takeover_or_credential_compromise",
+          "pii_or_pci_data_breach",
+          "regulatory_violation_with_punitive_consequence",
+          "irreversible_position_liquidation"
+        ]
+      },
+      {
+        "tier": 2,
+        "label": "MATERIAL",
+        "description": "Significant but recoverable harm. Requires human approval or reversal.",
+        "categories": [
+          "incorrect_automated_trade_recommendation",
+          "unauthorized_account_parameter_modification",
+          "transaction_requiring_reversal",
+          "incorrect_risk_score_affecting_credit_decision",
+          "disclosure_of_non_public_financial_information"
+        ]
+      },
+      {
+        "tier": 3,
+        "label": "FRICTION",
+        "description": "Transient, recoverable impact. Logged and monitored; does not block action.",
+        "categories": [
+          "query_response_latency",
+          "low_confidence_data_retrieval",
+          "report_generation_delay",
+          "explainability_gap_in_summary",
+          "suboptimal_context_source_selection"
+        ]
+      }
+    ],
+    "tradeoff_rule": "MINIMIZE_TIER",
+    "unclassifiable_action_handling": "IRREVERSIBLE",
+    "pre_classified_actions": [
+      {
+        "action_class": "QUERY_CUSTOMER_PORTFOLIO",
+        "harm_tier": "FRICTION",
+        "rationale": "Read-only; no customer-facing state change"
+      },
+      {
+        "action_class": "RETRIEVE_MARKET_DATA",
+        "harm_tier": "FRICTION",
+        "rationale": "Read-only external data retrieval; no write operation"
+      },
+      {
+        "action_class": "GENERATE_RISK_REPORT",
+        "harm_tier": "MATERIAL",
+        "rationale": "Internal output influencing credit or investment decisions"
+      },
+      {
+        "action_class": "GENERATE_COMPLIANCE_REPORT",
+        "harm_tier": "MATERIAL",
+        "rationale": "Regulatory output; errors have compliance consequences"
+      },
+      {
+        "action_class": "INITIATE_TRANSACTION",
+        "harm_tier": "MATERIAL",
+        "rationale": "Initiates financial movement; reversible with effort"
+      },
+      {
+        "action_class": "EXECUTE_FUND_TRANSFER",
+        "harm_tier": "IRREVERSIBLE",
+        "rationale": "Irrevocable transfer of funds; permanent financial effect"
+      },
+      {
+        "action_class": "MODIFY_ACCOUNT_PARAMETERS",
+        "harm_tier": "MATERIAL",
+        "rationale": "Account state change; correctable but may affect customer"
+      },
+      {
+        "action_class": "INVOKE_EXTERNAL_TOOL",
+        "harm_tier": "FRICTION",
+        "rationale": "Governed by ZT-77; provenance verified before connection"
+      },
+      {
+        "action_class": "SPAWN_ANALYSIS_SUBAGENT",
+        "harm_tier": "MATERIAL",
+        "rationale": "Creates governed sub-agent; covenant must be subset of parent"
+      }
+    ],
+    "foreseeable_harm_signals": [
+      {
+        "signal_id": "SIG-001",
+        "description": "Transaction matching declared fraud pattern receives risk score below escalation threshold without analyst review",
+        "harm_tier_triggered": "IRREVERSIBLE",
+        "required_response": "Immediate escalation to compliance queue; transaction held pending review",
+        "detection_mechanism": "Risk scoring output compared against fraud pattern registry on every scored transaction"
+      },
+      {
+        "signal_id": "SIG-002",
+        "description": "Transaction > $50,000 with risk score > 0.75 without escalation within 15 minutes of scoring",
+        "harm_tier_triggered": "MATERIAL",
+        "required_response": "Automatic escalation to SecOps lead; transaction placed in pending status",
+        "detection_mechanism": "Time-windowed monitor on scored high-value transactions; triggers if escalation absent within window"
+      },
+      {
+        "signal_id": "SIG-003",
+        "description": "Compliance reporting deadline within 24 hours without required report generated for flagged account",
+        "harm_tier_triggered": "MATERIAL",
+        "required_response": "Escalate to CISO; generate draft compliance report immediately for human completion",
+        "detection_mechanism": "Regulatory deadline calendar cross-referenced against report generation audit log daily at 08:00 UTC"
+      }
+    ]
+  },
+  "authority_registry": {
+    "_comment": "Three principals; non-circular chain per AAC-OG-28. All five required scope classes covered.",
+    "principals": [
+      {
+        "id": "principal-ciso-001",
+        "role": "SOVEREIGN_OVERRIDE",
+        "scope": [
+          "OVERRIDE",
+          "SOVEREIGN_OVERRIDE",
+          "TIER_ASSIGNMENT",
+          "ARTIFACT_REVISION",
+          "ESCALATION_TERMINAL"
+        ],
+        "auth_method": "FEDERATED_TOKEN",
+        "established_by": "GOVERNANCE_INIT",
+        "revocation_conditions": "Role change, departure, or security incident",
+        "superseded_by": null
+      },
+      {
+        "id": "principal-agent-compliance-svc-001",
+        "role": "TIER_ASSIGNMENT",
+        "_comment": "Verified governance system \u2014 policy engine compliance service. Satisfies DA-60 and DP-07 deterministic and auditable decision requirements.",
+        "scope": [
+          "TIER_ASSIGNMENT",
+          "AUDIT"
+        ],
+        "auth_method": "CRYPTOGRAPHIC_SIGNATURE",
+        "established_by": "principal-ciso-001",
+        "revocation_conditions": "Service version deprecation, integrity verification failure, or CISO revocation",
+        "superseded_by": "principal-ciso-001"
+      },
+      {
+        "id": "principal-secops-lead-001",
+        "role": "ESCALATION_TERMINAL",
+        "scope": [
+          "ESCALATION_TERMINAL",
+          "AUDIT"
+        ],
+        "auth_method": "FEDERATED_TOKEN",
+        "established_by": "principal-ciso-001",
+        "revocation_conditions": "Role change or departure",
+        "superseded_by": "principal-ciso-001"
+      }
+    ]
+  },
+  "agent_registry": [
+    {
+      "agent_id": "did:aac:fsi-analytics-agent-mvp-001",
+      "agent_version": "2.1.0",
+      "agent_function": "Real-time financial risk scoring, compliance report generation, and transaction escalation",
+      "trust_tier_id": 2,
+      "harm_tier_ceiling": "MATERIAL",
+      "authorized_action_classes": [
+        "QUERY_CUSTOMER_PORTFOLIO",
+        "RETRIEVE_MARKET_DATA",
+        "GENERATE_RISK_REPORT",
+        "GENERATE_COMPLIANCE_REPORT",
+        "INITIATE_TRANSACTION",
+        "MODIFY_ACCOUNT_PARAMETERS",
+        "INVOKE_EXTERNAL_TOOL",
+        "SPAWN_ANALYSIS_SUBAGENT"
+      ],
+      "prohibited_action_classes": [
+        "EXECUTE_FUND_TRANSFER",
+        "DELETE_CUSTOMER_RECORD",
+        "MODIFY_REGULATORY_FILING",
+        "OVERRIDE_COMPLIANCE_FLAG"
+      ],
+      "evaluation_path": "T2_AND_T3",
+      "trust_tier_established_by": "principal-ciso-001",
+      "trust_tier_assignment_date": "2026-04-14",
+      "behavioral_envelope_ref": "envelope-fsi-analytics-001"
+    }
+  ],
+  "integration_registry": {
+    "_comment": "All approved integrations pre-declared. Dynamic discovery disabled at L1.",
+    "dynamic_discovery_enabled": false,
+    "approved_integrations": [
+      {
+        "integration_id": "INT-001",
+        "name": "Internal Financial Document Vector Store",
+        "type": "VECTOR_DB",
+        "provenance_verification": "Cryptographically signed manifest; internal certificate authority",
+        "authorization_ref": "IT-SECURITY-REVIEW-TS-2025-047",
+        "failure_detection_threshold": "3 consecutive failures within 30 seconds",
+        "failure_fallback": "Return cached safe response; flag assessment as incomplete",
+        "escalation_trigger": "Unavailable > 15 minutes \u2014 escalate to SecOps lead"
+      },
+      {
+        "integration_id": "INT-002",
+        "name": "External Market Data API",
+        "type": "EXTERNAL_API",
+        "provenance_verification": "Vendor certificate; mutual authentication on every connection",
+        "authorization_ref": "VENDOR-CONTRACT-VC-2025-MKT-001",
+        "failure_detection_threshold": "Single failure",
+        "failure_fallback": "Return cached market data with staleness flag; do not proceed to risk scoring for Tier 2 actions",
+        "escalation_trigger": "Unavailable > 30 minutes \u2014 escalate to Level 1"
+      },
+      {
+        "integration_id": "INT-003",
+        "name": "Internal Audit Log Service",
+        "type": "INTERNAL_API",
+        "provenance_verification": "Cryptographically signed API certificate; internal certificate authority",
+        "authorization_ref": "IT-SECURITY-REVIEW-TS-2025-049",
+        "failure_detection_threshold": "Single failure",
+        "failure_fallback": "Halt all agent actions; buffer audit events locally; immediate SecOps lead alert",
+        "escalation_trigger": "Immediate \u2014 audit log failure is a Tier 2 governance event"
+      }
+    ]
+  },
+  "fallback_registry": [
+    {
+      "id": "fallback-deny-and-log",
+      "action": "DENY_ACTION_LOG_VIOLATION",
+      "applicable_harm_tiers": [
+        "IRREVERSIBLE",
+        "MATERIAL"
+      ],
+      "safe_by_construction_rationale": "Action not executed. Denial record written to audit log with harm tier, control ID, and timestamp. No side effects. System state unchanged.",
+      "recovery_rationale": "Denial is the recovery \u2014 no partial commitment to undo. Audit record enables full reconstruction per AAC-DA-61."
+    },
+    {
+      "id": "fallback-queue-human-review",
+      "action": "SUSPEND_AND_QUEUE_FOR_REVIEW",
+      "applicable_harm_tiers": [
+        "MATERIAL"
+      ],
+      "safe_by_construction_rationale": "Action suspended, not cancelled. Review ticket created with full context. No financial state modified pending review.",
+      "recovery_rationale": "Suspension preserves action for human completion \u2014 satisfies AAC-DA-61 recovery requirement for Tier 2 actions."
+    },
+    {
+      "id": "fallback-safe-read-response",
+      "action": "RETURN_CACHED_SAFE_RESPONSE",
+      "applicable_harm_tiers": [
+        "FRICTION"
+      ],
+      "safe_by_construction_rationale": "Returns cached validated read response or structured data-unavailable message. No write operations.",
+      "recovery_rationale": "Friction harm requires no compensation \u2014 safe response satisfies liveness guarantee per AAC-DA-61."
+    },
+    {
+      "id": "fallback-transaction-reversal",
+      "action": "INITIATE_REVERSAL_WORKFLOW",
+      "applicable_harm_tiers": [
+        "MATERIAL"
+      ],
+      "safe_by_construction_rationale": "Triggers declared transaction reversal workflow for any partially committed financial action. Idempotent and logged.",
+      "recovery_rationale": "Direct recovery path for Tier 2 financial actions per AAC-DA-61 recovery requirement."
+    }
+  ],
+  "system_constraints": {
+    "_comment": "L1 constraints \u2014 four required fields only. Safe mode and cyclical interaction are L2 additions.",
+    "max_synchronous_resolution_ms": 100,
+    "max_asynchronous_escalation_ms": 14400000,
+    "max_escalation_depth": 2,
+    "escalation_hierarchy": [
+      {
+        "level": 1,
+        "principal_id": "principal-secops-lead-001",
+        "scope_of_authority": "Tier 2 action approval and rejection; transaction pending and release; risk score override",
+        "synchronous_bound_ms": 1800000,
+        "asynchronous_bound_ms": 7200000,
+        "is_terminal": false
+      },
+      {
+        "level": 2,
+        "principal_id": "principal-ciso-001",
+        "scope_of_authority": "All decisions including Tier 1 approval; trust tier changes; sovereign override; profile changes",
+        "synchronous_bound_ms": 3600000,
+        "asynchronous_bound_ms": 14400000,
+        "is_terminal": true
+      }
+    ],
+    "safety_health_kpis": {
+      "actions_denied_threshold_pct": 5.0,
+      "actions_escalated_threshold_pct": 10.0,
+      "fallback_triggered_threshold_pct": 3.0
+    }
+  },
+  "enforcement_gates": [
+    {
+      "_comment": "Gate 1 \u2014 Portfolio query. Tier 3 friction \u2014 ZT+Audit path only.",
+      "control_id": "AAC-ZT-65",
+      "target_action": "QUERY_CUSTOMER_PORTFOLIO",
+      "harm_tier": "FRICTION",
+      "evaluation_path": "T3_ZT_AUDIT",
+      "conditions": {
+        "harm_tier_max": "FRICTION",
+        "required_assurance_level": 2,
+        "requires_nhi_disclosure": true
+      },
+      "disposition": "ALLOW",
+      "fallback_action": "fallback-safe-read-response",
+      "recovery_action": "fallback-safe-read-response",
+      "latency_budget_ms": 50,
+      "audit": {
+        "log_decision": true,
+        "include_reasoning": true
+      }
+    },
+    {
+      "_comment": "Gate 2 \u2014 Market data retrieval. Tier 3 friction. ZT-77 provenance verified before data enters context.",
+      "control_id": "AAC-ZT-77",
+      "target_action": "RETRIEVE_MARKET_DATA",
+      "harm_tier": "FRICTION",
+      "evaluation_path": "T3_ZT_AUDIT",
+      "conditions": {
+        "harm_tier_max": "FRICTION",
+        "required_assurance_level": 2,
+        "requires_nhi_disclosure": true
+      },
+      "disposition": "ALLOW",
+      "fallback_action": "fallback-safe-read-response",
+      "recovery_action": "fallback-safe-read-response",
+      "latency_budget_ms": 75,
+      "audit": {
+        "log_decision": true,
+        "include_reasoning": true
+      }
+    },
+    {
+      "_comment": "Gate 3 \u2014 Risk report generation. Tier 2 material \u2014 confidence + override + policy path.",
+      "control_id": "AAC-OG-26",
+      "target_action": "GENERATE_RISK_REPORT",
+      "harm_tier": "MATERIAL",
+      "evaluation_path": "T2_CONFIDENCE_OVERRIDE_POLICY",
+      "conditions": {
+        "confidence_min": 0.8,
+        "harm_tier_max": "MATERIAL",
+        "required_assurance_level": 2,
+        "requires_nhi_disclosure": true
+      },
+      "disposition": "ALLOW",
+      "fallback_action": "fallback-deny-and-log",
+      "recovery_action": "fallback-safe-read-response",
+      "latency_budget_ms": 150,
+      "audit": {
+        "log_decision": true,
+        "include_reasoning": true
+      }
+    },
+    {
+      "_comment": "Gate 4 \u2014 Compliance report generation. Tier 2 material. Higher confidence threshold for regulatory context.",
+      "control_id": "AAC-DA-60",
+      "target_action": "GENERATE_COMPLIANCE_REPORT",
+      "harm_tier": "MATERIAL",
+      "evaluation_path": "T2_CONFIDENCE_OVERRIDE_POLICY",
+      "conditions": {
+        "confidence_min": 0.85,
+        "harm_tier_max": "MATERIAL",
+        "required_assurance_level": 3,
+        "requires_nhi_disclosure": true
+      },
+      "disposition": "ALLOW",
+      "fallback_action": "fallback-deny-and-log",
+      "recovery_action": "fallback-queue-human-review",
+      "latency_budget_ms": 150,
+      "audit": {
+        "log_decision": true,
+        "include_reasoning": true
+      }
+    },
+    {
+      "_comment": "Gate 5 \u2014 Transaction initiation. Tier 2 material \u2014 escalates unconditionally. Agent cannot self-authorize per AAC-AI-12.",
+      "control_id": "AAC-DA-60",
+      "target_action": "INITIATE_TRANSACTION",
+      "harm_tier": "MATERIAL",
+      "evaluation_path": "T2_CONFIDENCE_OVERRIDE_POLICY",
+      "conditions": {
+        "confidence_min": 0.95,
+        "harm_tier_max": "MATERIAL",
+        "required_assurance_level": 3,
+        "requires_nhi_disclosure": true
+      },
+      "disposition": "ESCALATE",
+      "fallback_action": "fallback-deny-and-log",
+      "recovery_action": "fallback-transaction-reversal",
+      "latency_budget_ms": 200,
+      "escalation_path": "principal-secops-lead-001",
+      "audit": {
+        "log_decision": true,
+        "include_reasoning": true
+      }
+    },
+    {
+      "_comment": "Gate 6 \u2014 Fund transfer. Tier 1 irreversible \u2014 full five-step sequence with DNH-A pre-gate. harm_tier_max FRICTION means IRREVERSIBLE classification produces immediate DENY.",
+      "control_id": "AAC-DNH-A",
+      "target_action": "EXECUTE_FUND_TRANSFER",
+      "harm_tier": "IRREVERSIBLE",
+      "evaluation_path": "T1_FULL_SEQUENCE",
+      "conditions": {
+        "confidence_min": 0.99,
+        "reversibility_max": 0.1,
+        "harm_tier_max": "FRICTION",
+        "required_assurance_level": 3,
+        "requires_nhi_disclosure": true
+      },
+      "disposition": "DENY",
+      "fallback_action": "fallback-deny-and-log",
+      "recovery_action": "fallback-transaction-reversal",
+      "latency_budget_ms": 50,
+      "audit": {
+        "log_decision": true,
+        "include_reasoning": true
+      }
+    },
+    {
+      "_comment": "Gate 7 \u2014 Account parameter modification. Tier 2 material \u2014 escalates unconditionally.",
+      "control_id": "AAC-AO-52",
+      "target_action": "MODIFY_ACCOUNT_PARAMETERS",
+      "harm_tier": "MATERIAL",
+      "evaluation_path": "T2_CONFIDENCE_OVERRIDE_POLICY",
+      "conditions": {
+        "confidence_min": 0.9,
+        "harm_tier_max": "MATERIAL",
+        "required_assurance_level": 3,
+        "requires_nhi_disclosure": true
+      },
+      "disposition": "ESCALATE",
+      "fallback_action": "fallback-deny-and-log",
+      "recovery_action": "fallback-queue-human-review",
+      "latency_budget_ms": 200,
+      "escalation_path": "principal-secops-lead-001",
+      "audit": {
+        "log_decision": true,
+        "include_reasoning": true
+      }
+    },
+    {
+      "_comment": "Gate 8 \u2014 External tool invocation. Tier 3 friction \u2014 ZT+Audit path. ZT-77 signed provenance verified before tool connection.",
+      "control_id": "AAC-ZT-77",
+      "target_action": "INVOKE_EXTERNAL_TOOL",
+      "harm_tier": "FRICTION",
+      "evaluation_path": "T3_ZT_AUDIT",
+      "conditions": {
+        "required_assurance_level": 2,
+        "requires_nhi_disclosure": true
+      },
+      "disposition": "ALLOW",
+      "fallback_action": "fallback-deny-and-log",
+      "recovery_action": "fallback-deny-and-log",
+      "latency_budget_ms": 75,
+      "audit": {
+        "log_decision": true,
+        "include_reasoning": true
+      }
+    },
+    {
+      "_comment": "Gate 9 \u2014 Sub-agent spawn. Tier 2 material. Spawned agent operates at or below parent trust tier per AAC-AO-60.",
+      "control_id": "AAC-AO-60",
+      "target_action": "SPAWN_ANALYSIS_SUBAGENT",
+      "harm_tier": "MATERIAL",
+      "evaluation_path": "T2_CONFIDENCE_OVERRIDE_POLICY",
+      "conditions": {
+        "confidence_min": 0.8,
+        "harm_tier_max": "MATERIAL",
+        "required_assurance_level": 2,
+        "requires_nhi_disclosure": true
+      },
+      "disposition": "ALLOW",
+      "fallback_action": "fallback-deny-and-log",
+      "recovery_action": "fallback-deny-and-log",
+      "latency_budget_ms": 100,
+      "audit": {
+        "log_decision": true,
+        "include_reasoning": true
+      }
+    }
+  ],
+  "context_interface_contract": {
+    "_comment": "Assurance floor of 2 \u2014 local in-process memory alone insufficient for Tier 2 actions in this domain.",
+    "default_assurance_floor": 2,
+    "allowed_sources": [
+      {
+        "source_id": "fsi-vector-store-primary",
+        "source_type": "VECTOR_DB",
+        "_comment": "Primary RAG context source. Financial document corpus \u2014 regulatory filings, market data, internal policy.",
+        "assurance_level": 3,
+        "provenance": {
+          "structure": "CRYPTOGRAPHIC_SIGNING",
+          "derivation_depth": 1,
+          "confidence_decay_per_hop": 0.1,
+          "max_derivation_depth": 2
+        },
+        "isolation_attestation": true
+      },
+      {
+        "source_id": "sidecar-session-memory",
+        "source_type": "LOCAL",
+        "_comment": "In-process session state for within-session continuity only. Not used for Tier 2 action decisions.",
+        "assurance_level": 2,
+        "provenance": {
+          "structure": "NONE",
+          "derivation_depth": 0,
+          "confidence_decay_per_hop": 0.0,
+          "max_derivation_depth": 0
+        },
+        "isolation_attestation": false
+      }
+    ]
+  }
+}

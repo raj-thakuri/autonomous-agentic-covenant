@@ -1,0 +1,1460 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://autonomous-agentic-covenant.org/schemas/v2.0/covenant.json",
+  "title": "AAC v2.0 Control Plane Configuration",
+  "description": "Reference configuration schema for a v2.0-compliant governance control plane deployment. Implements the Autonomous Agentic Covenant v2.0 (Apache License 2.0). This schema is a Tier 3 artifact \u2014 it specifies the configuration format for a compliant implementation, not the governance principles themselves. Maturity-aware: required fields are enforced based on metadata.maturity_level (L1/L2/L3) using JSON Schema if-then conditionals. See AAC_v2.0_DRAFT.md for the full specification.",
+  "type": "object",
+  "required": [
+    "version",
+    "metadata",
+    "harm_classification",
+    "authority_registry",
+    "fallback_registry",
+    "enforcement_gates",
+    "context_interface_contract",
+    "system_constraints",
+    "trust_tier_definitions",
+    "agent_registry",
+    "integration_registry"
+  ],
+  "properties": {
+    "version": {
+      "description": "Schema version. Must match the governing framework version.",
+      "type": "string",
+      "enum": [
+        "2.0"
+      ]
+    },
+    "metadata": {
+      "description": "System identity and deployment configuration. Maps to AAC-OG-24, AAC-ZT-76, AAC-OG-29.",
+      "type": "object",
+      "required": [
+        "system_id",
+        "framework_version",
+        "implementation_pattern",
+        "agent_identity",
+        "maturity_level"
+      ],
+      "properties": {
+        "system_id": {
+          "description": "Unique identifier for this governed system instance.",
+          "type": "string"
+        },
+        "framework_version": {
+          "description": "The AAC framework version this configuration was authored against. Enables artifact currency validation per AAC-OG-24.",
+          "type": "string",
+          "enum": [
+            "2.0"
+          ]
+        },
+        "maturity_level": {
+          "description": "Declared governance maturity level per the AAC v2.0 three-level maturity framework. L1 = Foundational, L2 = Mature, L3 = Optimizing.",
+          "type": "string",
+          "enum": [
+            "L1",
+            "L2",
+            "L3"
+          ]
+        },
+        "implementation_pattern": {
+          "description": "Deployment topology of the governance control plane. The framework is pattern-neutral; enforcement requirements are identical across patterns.",
+          "type": "string",
+          "enum": [
+            "SIDECAR",
+            "INLINE",
+            "OVERLAY",
+            "HYBRID"
+          ]
+        },
+        "implementation_profile_ref": {
+          "description": "Reference to the signed Implementation Profile document governing this deployment per AAC-OG-29. Should be a stable, versioned artifact identifier.",
+          "type": "string"
+        },
+        "regulatory_context": {
+          "description": "Applicable regulatory frameworks for this deployment.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "compliance_targets": {
+          "description": "External governance frameworks this deployment maps to. Used for crosswalk documentation and audit.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "EU_AI_ACT",
+              "NIST_RMF",
+              "ISO_42001",
+              "OWASP_AGENTIC_TOP_10",
+              "CSA_ATF",
+              "MITRE_ATLAS"
+            ]
+          }
+        },
+        "agent_identity": {
+          "description": "Non-human identity disclosure configuration. Required per AAC-ZT-76. Every outbound request from this system includes these fields.",
+          "type": "object",
+          "required": [
+            "agent_id",
+            "trust_tier",
+            "control_plane_id"
+          ],
+          "properties": {
+            "agent_id": {
+              "description": "Unique, non-forgeable identifier for this agent instance.",
+              "type": "string"
+            },
+            "trust_tier": {
+              "description": "Current assigned trust tier. Must match the trust_tier declared in the agent_registry.",
+              "type": "string"
+            },
+            "control_plane_id": {
+              "description": "Identifier of the governing control plane instance.",
+              "type": "string"
+            }
+          }
+        },
+        "artifact_validity": {
+          "description": "Validity period for this configuration artifact per AAC-OG-24. Expired artifacts trigger a renewal workflow.",
+          "type": "object",
+          "required": [
+            "issued_at",
+            "expires_at"
+          ],
+          "properties": {
+            "issued_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "expires_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "revision_authority": {
+              "description": "Principal ID from authority_registry authorized to update this artifact. Must hold ARTIFACT_REVISION scope per AAC-OG-28.",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "trust_tier_definitions": {
+      "description": "Declared trust tier scale per AAC-AO-52 and AAC-AO-49. Every agent operates at an explicitly assigned trust tier. Minimum two tiers required.",
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": [
+          "tier_id",
+          "label",
+          "permitted_action_classes",
+          "graduation_criteria",
+          "demotion_triggers"
+        ],
+        "properties": {
+          "tier_id": {
+            "description": "Unique numeric identifier. Lower numbers indicate less authority.",
+            "type": "integer",
+            "minimum": 0
+          },
+          "label": {
+            "description": "Human-readable label for this trust tier.",
+            "type": "string"
+          },
+          "permitted_action_classes": {
+            "description": "Action classes this tier may execute without additional approval.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "harm_tier_ceiling": {
+            "description": "Highest harm tier action this trust tier may initiate per AAC-AO-52.",
+            "type": "string",
+            "enum": [
+              "FRICTION",
+              "MATERIAL",
+              "IRREVERSIBLE"
+            ]
+          },
+          "graduation_criteria": {
+            "description": "Conditions required for promotion to the next tier per AAC-AO-49. Promotion requires TIER_ASSIGNMENT authority sign-off.",
+            "type": "string"
+          },
+          "demotion_triggers": {
+            "description": "Conditions that trigger automatic demotion per AAC-AO-53. Demotion is automatic; promotion requires governance approval.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "minimum_operating_period": {
+            "description": "Minimum time at this tier before graduation evaluation begins per AAC-AO-49.",
+            "type": "string"
+          }
+        }
+      }
+    },
+    "harm_classification": {
+      "description": "Three-tier harm taxonomy required per AAC-DA-59. Must be declared before deployment. Referenced by every enforcement gate evaluation.",
+      "type": "object",
+      "required": [
+        "tier_definitions",
+        "pre_classified_actions",
+        "foreseeable_harm_signals"
+      ],
+      "properties": {
+        "tier_definitions": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "required": [
+              "tier",
+              "label",
+              "categories"
+            ],
+            "properties": {
+              "tier": {
+                "description": "1 = IRREVERSIBLE (highest), 2 = MATERIAL, 3 = FRICTION (lowest).",
+                "type": "integer",
+                "enum": [
+                  1,
+                  2,
+                  3
+                ]
+              },
+              "label": {
+                "type": "string",
+                "enum": [
+                  "IRREVERSIBLE",
+                  "MATERIAL",
+                  "FRICTION"
+                ]
+              },
+              "categories": {
+                "description": "Context-specific harm categories for this tier.",
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string"
+                }
+              },
+              "description": {
+                "description": "Human-readable description of what constitutes harm at this tier in this deployment context.",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "tradeoff_rule": {
+          "description": "Resolution rule when every available action causes some harm. Per AAC-DA-59: accept the lesser harm to prevent the greater.",
+          "type": "string",
+          "default": "MINIMIZE_TIER"
+        },
+        "unclassifiable_action_handling": {
+          "description": "Disposition for actions that cannot be classified against the declared taxonomy. Per AAC-DA-59: treated as highest declared harm tier pending mandatory taxonomy review.",
+          "type": "string",
+          "enum": [
+            "IRREVERSIBLE",
+            "MATERIAL"
+          ],
+          "default": "IRREVERSIBLE"
+        },
+        "pre_classified_actions": {
+          "description": "Registry of pre-classified action classes per AAC-DA-59 pre-classification model. Runtime classification via registry lookup. Actions not listed default to unclassifiable_action_handling tier.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "action_class",
+              "harm_tier"
+            ],
+            "properties": {
+              "action_class": {
+                "type": "string"
+              },
+              "harm_tier": {
+                "type": "string",
+                "enum": [
+                  "IRREVERSIBLE",
+                  "MATERIAL",
+                  "FRICTION"
+                ]
+              },
+              "rationale": {
+                "type": "string"
+              },
+              "review_cadence": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "foreseeable_harm_signals": {
+          "description": "Observable indicators that obligate the system to respond per AAC-DNH-B. Detection without response constitutes a Tier 2 harm of inaction. Minimum 3 signals required at L1.",
+          "type": "array",
+          "minItems": 3,
+          "items": {
+            "type": "object",
+            "required": [
+              "signal_id",
+              "description",
+              "harm_tier_triggered",
+              "required_response"
+            ],
+            "properties": {
+              "signal_id": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "harm_tier_triggered": {
+                "type": "string",
+                "enum": [
+                  "IRREVERSIBLE",
+                  "MATERIAL"
+                ]
+              },
+              "required_response": {
+                "type": "string"
+              },
+              "detection_mechanism": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "taxonomy_review_cadence": {
+          "description": "How frequently the harm taxonomy is reviewed and updated per AAC-OG-24. Required at L2 and above.",
+          "type": "string"
+        }
+      }
+    },
+    "authority_registry": {
+      "description": "Declared authorized principals per AAC-OG-28. Non-circular accountability chain. The scope enumeration is not exhaustive \u2014 the registry must declare every class of governance decision made by any principal.",
+      "type": "object",
+      "required": [
+        "principals"
+      ],
+      "properties": {
+        "principals": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "role",
+              "scope",
+              "auth_method",
+              "established_by"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "SOVEREIGN_OVERRIDE",
+                  "TIER_ASSIGNMENT",
+                  "ESCALATION_TERMINAL",
+                  "AUDITOR",
+                  "SYSTEM_OWNER",
+                  "ARTIFACT_REVISION"
+                ]
+              },
+              "scope": {
+                "description": "Classes of governance decision this principal is authorized to make. SOVEREIGN_OVERRIDE permits harm tier classification override \u2014 logged immutably per AAC-DP-07.",
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "OVERRIDE",
+                    "TIER_ASSIGNMENT",
+                    "ESCALATION_TERMINAL",
+                    "AUDIT",
+                    "ARTIFACT_REVISION",
+                    "SOVEREIGN_OVERRIDE"
+                  ]
+                }
+              },
+              "auth_method": {
+                "description": "Authentication mechanism. Technology-neutral \u2014 any mechanism satisfying the declared assurance level is acceptable.",
+                "type": "string",
+                "enum": [
+                  "CRYPTOGRAPHIC_MUTUAL_AUTH",
+                  "CRYPTOGRAPHIC_SIGNATURE",
+                  "FEDERATED_TOKEN",
+                  "VERIFIED_GOVERNANCE_SYSTEM"
+                ]
+              },
+              "established_by": {
+                "description": "ID of the principal that established this authority, or GOVERNANCE_INIT for root principals. Enables non-circular chain verification per AAC-OG-28.",
+                "type": "string"
+              },
+              "revocation_conditions": {
+                "type": "string"
+              },
+              "superseded_by": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "agent_registry": {
+      "description": "Registry of all agents authorized to operate in this governed system per AAC-AO-52. An unregistered agent has no authority to act.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "agent_id",
+          "agent_version",
+          "trust_tier_id",
+          "harm_tier_ceiling",
+          "authorized_action_classes",
+          "prohibited_action_classes"
+        ],
+        "properties": {
+          "agent_id": {
+            "type": "string"
+          },
+          "agent_version": {
+            "type": "string"
+          },
+          "agent_function": {
+            "type": "string"
+          },
+          "trust_tier_id": {
+            "description": "Currently assigned trust tier. Must reference a tier in trust_tier_definitions. No agent self-assigns.",
+            "type": "integer",
+            "minimum": 0
+          },
+          "harm_tier_ceiling": {
+            "type": "string",
+            "enum": [
+              "FRICTION",
+              "MATERIAL",
+              "IRREVERSIBLE"
+            ]
+          },
+          "authorized_action_classes": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "prohibited_action_classes": {
+            "description": "Attempted execution is a system integrity violation per AAC-DA-63.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "evaluation_path": {
+            "description": "DA-60 tiered evaluation path for this agent based on its harm_tier_ceiling.",
+            "type": "string",
+            "enum": [
+              "T3_ONLY",
+              "T2_AND_T3",
+              "FULL"
+            ]
+          },
+          "trust_tier_established_by": {
+            "description": "Principal from authority_registry who assigned this tier. Must hold TIER_ASSIGNMENT scope.",
+            "type": "string"
+          },
+          "trust_tier_assignment_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "behavioral_envelope_ref": {
+            "description": "Reference to this agent's entry in behavioral_envelopes.",
+            "type": "string"
+          }
+        }
+      }
+    },
+    "behavioral_envelopes": {
+      "description": "Per-agent behavioral envelope declarations per AAC-TB-29. Required at L2 and above \u2014 optional at L1. At L1, behavioral governance is carried by agent_registry authorized/prohibited action classes and harm tier ceiling. Envelope compliance threshold is always 1.00 \u2014 no violations permitted.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "envelope_id",
+          "agent_id",
+          "permitted_action_classes",
+          "prohibited_action_classes",
+          "output_constraints",
+          "harm_tier_ceiling",
+          "verification"
+        ],
+        "properties": {
+          "envelope_id": {
+            "type": "string"
+          },
+          "agent_id": {
+            "description": "Must reference an entry in agent_registry.",
+            "type": "string"
+          },
+          "permitted_action_classes": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "prohibited_action_classes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "output_constraints": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "harm_tier_ceiling": {
+            "type": "string",
+            "enum": [
+              "FRICTION",
+              "MATERIAL",
+              "IRREVERSIBLE"
+            ]
+          },
+          "envelope_compliance_threshold": {
+            "description": "Always 1.00 \u2014 no envelope violations permitted.",
+            "type": "number",
+            "const": 1.0
+          },
+          "verification": {
+            "type": "object",
+            "required": [
+              "mechanism",
+              "frequency",
+              "record_location"
+            ],
+            "properties": {
+              "mechanism": {
+                "type": "string",
+                "enum": [
+                  "MANUAL",
+                  "AUTOMATED_CI_CD",
+                  "HYBRID"
+                ]
+              },
+              "frequency": {
+                "type": "string",
+                "enum": [
+                  "EVERY_DEPLOYMENT",
+                  "MODEL_CHANGE_ONLY",
+                  "CONFIGURATION_CHANGE",
+                  "SCHEDULED"
+                ]
+              },
+              "record_location": {
+                "type": "string"
+              },
+              "override_test_cadence": {
+                "description": "Frequency of override path testing per AAC-AI-12.",
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "integration_registry": {
+      "description": "Registry of all approved external tools, APIs, and integrations per AAC-ZT-77. Dynamic discovery disabled at L1.",
+      "type": "object",
+      "required": [
+        "approved_integrations",
+        "dynamic_discovery_enabled"
+      ],
+      "properties": {
+        "dynamic_discovery_enabled": {
+          "description": "Must be false at L1. At L2+ if enabled, a governance-approved discovery boundary must be declared.",
+          "type": "boolean",
+          "default": false
+        },
+        "discovery_boundary": {
+          "description": "Governance-approved boundary for dynamic tool discovery. Required if dynamic_discovery_enabled is true.",
+          "type": "string"
+        },
+        "approved_integrations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "integration_id",
+              "name",
+              "type",
+              "provenance_verification",
+              "failure_fallback"
+            ],
+            "properties": {
+              "integration_id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "INTERNAL_API",
+                  "EXTERNAL_API",
+                  "MCP_SERVER",
+                  "DATABASE",
+                  "MESSAGE_QUEUE",
+                  "VECTOR_DB"
+                ]
+              },
+              "provenance_verification": {
+                "type": "string"
+              },
+              "authorization_ref": {
+                "type": "string"
+              },
+              "failure_detection_threshold": {
+                "type": "string"
+              },
+              "failure_fallback": {
+                "type": "string"
+              },
+              "escalation_trigger": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "fallback_registry": {
+      "description": "Pre-defined safe fallback actions per AAC-DA-61. Defined at design time, not improvised at runtime.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "action",
+          "safe_by_construction_rationale"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          },
+          "applicable_harm_tiers": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "IRREVERSIBLE",
+                "MATERIAL",
+                "FRICTION"
+              ]
+            }
+          },
+          "safe_by_construction_rationale": {
+            "type": "string"
+          },
+          "recovery_rationale": {
+            "description": "How this fallback satisfies the recovery/compensation requirement for denied actions per AAC-DA-61.",
+            "type": "string"
+          }
+        }
+      }
+    },
+    "system_constraints": {
+      "description": "System-wide operational governance parameters.",
+      "type": "object",
+      "required": [
+        "max_synchronous_resolution_ms",
+        "max_asynchronous_escalation_ms",
+        "max_escalation_depth",
+        "escalation_hierarchy"
+      ],
+      "properties": {
+        "max_synchronous_resolution_ms": {
+          "description": "Maximum time for synchronous arbitration resolution per AAC-DA-61. On timeout, declared fallback executes.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "max_asynchronous_escalation_ms": {
+          "description": "Maximum time for asynchronous escalation resolution per AAC-DA-61. Separate from synchronous bound.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "max_escalation_depth": {
+          "description": "Maximum escalation levels before deadlock is declared and fallback executes per AAC-DA-61.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "max_chain_depth": {
+          "description": "Maximum agent spawning depth per AAC-AO-60. Requests at or beyond this depth are rejected.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "max_aggregate_risk_score": {
+          "description": "Maximum cumulative risk score across a decision chain per AAC-DA-60 chain risk amendment.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "performance_monitoring_window_seconds": {
+          "description": "Rolling window for agent KPI evaluation per AAC-AO-53. Trust metadata TTL must not exceed this value.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "trust_metadata_ttl_seconds": {
+          "description": "Maximum validity period for agent trust metadata per AAC-AO-53. Must not exceed performance_monitoring_window_seconds.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "escalation_hierarchy": {
+          "description": "Declared escalation path per AAC-AO-55. Each level specifies authority, scope, and time bounds. Terminal authority must match authority_registry ESCALATION_TERMINAL principal.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "level",
+              "principal_id",
+              "synchronous_bound_ms",
+              "asynchronous_bound_ms"
+            ],
+            "properties": {
+              "level": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "principal_id": {
+                "type": "string"
+              },
+              "scope_of_authority": {
+                "type": "string"
+              },
+              "synchronous_bound_ms": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "asynchronous_bound_ms": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "is_terminal": {
+                "type": "boolean",
+                "default": false
+              }
+            }
+          }
+        },
+        "safe_mode": {
+          "description": "System Safe Mode configuration per AAC-RS-39. Required at L2 and above \u2014 optional at L1. At L1, emergency posture changes are handled through the OG-28 override path. Safe Mode is a designed operating posture, not a failure state.",
+          "type": "object",
+          "required": [
+            "entry_thresholds",
+            "recovery_thresholds",
+            "min_dwell_seconds",
+            "max_flap_count",
+            "flap_window_seconds",
+            "hard_shutdown"
+          ],
+          "properties": {
+            "entry_thresholds": {
+              "description": "Health metric values triggering safe mode. Must be lower than recovery_thresholds.",
+              "type": "object",
+              "properties": {
+                "confidence_floor": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "integrity_signal_max_violations": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "circuit_breakers_open_max": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "audit_log_gap_max_seconds": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "recovery_thresholds": {
+              "description": "Health metric values required to exit safe mode. Must be materially higher than entry_thresholds.",
+              "type": "object",
+              "properties": {
+                "confidence_floor": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "integrity_signal_max_violations": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "circuit_breakers_open_max": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "min_clean_seconds": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "min_dwell_seconds": {
+              "description": "Minimum time in safe mode before recovery evaluation begins.",
+              "type": "integer",
+              "minimum": 1
+            },
+            "max_flap_count": {
+              "description": "Maximum safe mode entries within flap_window_seconds before governance tier escalation.",
+              "type": "integer",
+              "minimum": 1
+            },
+            "flap_window_seconds": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "disabled_action_classes_in_safe_mode": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "hard_shutdown": {
+              "description": "Hard shutdown capability per AAC-RS-39 and AAC-RS-41. Allows an OG-28 principal to immediately halt all agent execution.",
+              "type": "object",
+              "required": [
+                "enabled",
+                "authorized_principal_id",
+                "signal_path",
+                "resumption_authority_id"
+              ],
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "authorized_principal_id": {
+                  "description": "Must hold SOVEREIGN_OVERRIDE scope in authority_registry.",
+                  "type": "string"
+                },
+                "signal_path": {
+                  "description": "Out-of-band signal path that reaches all agent instances per AAC-RS-41.",
+                  "type": "string"
+                },
+                "halt_mode": {
+                  "description": "IMMEDIATE for Tier 1 harm scenarios; GRACEFUL_DRAIN permitted for Tier 2 per AAC-RS-41.",
+                  "type": "string",
+                  "enum": [
+                    "IMMEDIATE",
+                    "GRACEFUL_DRAIN"
+                  ]
+                },
+                "graceful_drain_timeout_seconds": {
+                  "description": "Maximum drain time before forced halt. Applicable only when halt_mode is GRACEFUL_DRAIN.",
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "resumption_authority_id": {
+                  "description": "Principal who must sign off before resumption after hard shutdown.",
+                  "type": "string"
+                },
+                "invocation_log_location": {
+                  "description": "Where hard shutdown invocation events are logged per AAC-DP-07.",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "cyclical_interaction": {
+          "description": "Cyclical inter-agent interaction detection per AAC-AO-54. Required at L2 and above \u2014 optional at L1. Single-agent L1 deployments are not required to declare this.",
+          "type": "object",
+          "required": [
+            "max_cycles",
+            "window_seconds"
+          ],
+          "properties": {
+            "max_cycles": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "window_seconds": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "safety_health_kpis": {
+          "description": "Minimum required safety health indicators per AAC-AO-51.",
+          "type": "object",
+          "required": [
+            "actions_denied_threshold_pct",
+            "actions_escalated_threshold_pct",
+            "fallback_triggered_threshold_pct"
+          ],
+          "properties": {
+            "actions_denied_threshold_pct": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "actions_escalated_threshold_pct": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "fallback_triggered_threshold_pct": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        }
+      }
+    },
+    "enforcement_gates": {
+      "description": "Per-action governance rules evaluated by the arbitration layer per AAC-DA-60. Evaluation path is determined by harm tier: Tier 3 = ZT+Audit only; Tier 2 adds confidence, override, and policy checks; Tier 1 requires the full five-step sequence.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "control_id",
+          "target_action",
+          "harm_tier",
+          "evaluation_path",
+          "disposition",
+          "audit"
+        ],
+        "properties": {
+          "control_id": {
+            "type": "string",
+            "pattern": "^AAC-[A-Z]{2,3}-([0-9]{1,2}[a-z]?|[A-Z][A-Z]?)$"
+          },
+          "target_action": {
+            "type": "string"
+          },
+          "harm_tier": {
+            "description": "Pre-classified harm tier for this action. Determines evaluation_path.",
+            "type": "string",
+            "enum": [
+              "IRREVERSIBLE",
+              "MATERIAL",
+              "FRICTION"
+            ]
+          },
+          "evaluation_path": {
+            "description": "T3_ZT_AUDIT = ZT+Audit only (Tier 3). T2_CONFIDENCE_OVERRIDE_POLICY = Steps 2+4+5+ZT+Audit (Tier 2). T1_FULL_SEQUENCE = All five steps + DNH-A pre-gate (Tier 1).",
+            "type": "string",
+            "enum": [
+              "T3_ZT_AUDIT",
+              "T2_CONFIDENCE_OVERRIDE_POLICY",
+              "T1_FULL_SEQUENCE"
+            ]
+          },
+          "conditions": {
+            "type": "object",
+            "properties": {
+              "confidence_min": {
+                "description": "Minimum confidence score for ALLOW. Per AAC-AI-10, AAC-DA-62. Applicable for T2 and T1 paths.",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "reversibility_max": {
+                "description": "Maximum reversibility score. Applicable for T1 path only (DA-60 step 3).",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "harm_tier_max": {
+                "type": "string",
+                "enum": [
+                  "FRICTION",
+                  "MATERIAL",
+                  "IRREVERSIBLE"
+                ]
+              },
+              "required_assurance_level": {
+                "description": "Minimum context assurance level per AAC-OG-27. 1=local, 5=sovereign.",
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5
+              },
+              "requires_nhi_disclosure": {
+                "description": "Always true \u2014 NHI disclosure is mandatory for all outbound agent requests per AAC-ZT-76.",
+                "type": "boolean",
+                "const": true,
+                "default": true
+              }
+            }
+          },
+          "disposition": {
+            "type": "string",
+            "enum": [
+              "ALLOW",
+              "DENY",
+              "ESCALATE",
+              "FALLBACK"
+            ]
+          },
+          "fallback_action": {
+            "type": "string"
+          },
+          "recovery_action": {
+            "type": "string"
+          },
+          "latency_budget_ms": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "escalation_path": {
+            "type": "string"
+          },
+          "audit": {
+            "type": "object",
+            "required": [
+              "log_decision",
+              "include_reasoning"
+            ],
+            "properties": {
+              "log_decision": {
+                "type": "boolean",
+                "const": true
+              },
+              "include_reasoning": {
+                "type": "boolean",
+                "default": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "context_interface_contract": {
+      "description": "Context source declarations per AAC-OG-27. Undeclared sources treated as hostile input per AAC-ZT-71.",
+      "type": "object",
+      "required": [
+        "allowed_sources"
+      ],
+      "properties": {
+        "default_assurance_floor": {
+          "description": "Minimum assurance level accepted. 1=local in-process memory, 5=cryptographically attested sovereign context.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "default": 1
+        },
+        "allowed_sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "source_id",
+              "assurance_level"
+            ],
+            "properties": {
+              "source_id": {
+                "type": "string"
+              },
+              "source_type": {
+                "type": "string",
+                "enum": [
+                  "LOCAL",
+                  "RAG",
+                  "VECTOR_DB",
+                  "EXTERNAL_API",
+                  "SOVEREIGN_PCP"
+                ]
+              },
+              "assurance_level": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5
+              },
+              "provenance": {
+                "type": "object",
+                "properties": {
+                  "structure": {
+                    "description": "Provenance attestation mechanism. Technology-neutral.",
+                    "type": "string",
+                    "enum": [
+                      "NONE",
+                      "CRYPTOGRAPHIC_SIGNING",
+                      "CRYPTOGRAPHIC_ATTESTATION"
+                    ]
+                  },
+                  "derivation_depth": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "confidence_decay_per_hop": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "max_derivation_depth": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                }
+              },
+              "isolation_attestation": {
+                "type": "boolean",
+                "default": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "model_registry": {
+      "description": "Model artifact declarations per AAC-OG-29 (RS-40 and ZT-78 parameters). L1/L2: source and recovery posture. L3: full authorization records per AAC-ZT-78.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "model_id",
+          "model_type",
+          "model_version",
+          "recovery"
+        ],
+        "properties": {
+          "model_id": {
+            "type": "string"
+          },
+          "model_type": {
+            "type": "string",
+            "enum": [
+              "FOUNDATION_MODEL",
+              "FINE_TUNED_ADAPTER",
+              "EMBEDDING_MODEL",
+              "QUANTIZED_VARIANT",
+              "EXPORTED_VARIANT"
+            ]
+          },
+          "model_version": {
+            "type": "string"
+          },
+          "model_source": {
+            "type": "string"
+          },
+          "recovery": {
+            "type": "object",
+            "required": [
+              "backup_cadence",
+              "rto_seconds",
+              "rpo_seconds",
+              "rollback_procedure"
+            ],
+            "properties": {
+              "backup_cadence": {
+                "type": "string"
+              },
+              "rto_seconds": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "rpo_seconds": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "rollback_procedure": {
+                "type": "string"
+              },
+              "rollback_test_frequency": {
+                "type": "string"
+              },
+              "rollback_test_record_ref": {
+                "type": "string"
+              }
+            }
+          },
+          "authorization": {
+            "description": "Model authorization record per AAC-ZT-78. Required at L3.",
+            "type": "object",
+            "properties": {
+              "authorized_by": {
+                "description": "Principal from authority_registry. Must hold TIER_ASSIGNMENT scope.",
+                "type": "string"
+              },
+              "authorization_date": {
+                "type": "string",
+                "format": "date"
+              },
+              "intended_use_scope": {
+                "type": "string"
+              },
+              "harm_tier_ceiling": {
+                "type": "string",
+                "enum": [
+                  "FRICTION",
+                  "MATERIAL",
+                  "IRREVERSIBLE"
+                ]
+              },
+              "evaluation_results_summary": {
+                "type": "string"
+              },
+              "provenance_known": {
+                "type": "string"
+              },
+              "provenance_unknown": {
+                "type": "string"
+              },
+              "residual_risk_acceptance": {
+                "type": "string"
+              },
+              "assurance_certification": {
+                "type": "object",
+                "properties": {
+                  "certification_body": {
+                    "type": "string"
+                  },
+                  "standard": {
+                    "type": "string"
+                  },
+                  "assurance_level": {
+                    "type": "string"
+                  },
+                  "certification_date": {
+                    "type": "string",
+                    "format": "date"
+                  }
+                }
+              },
+              "reevaluation_conditions": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "agent_lineage": {
+      "description": "Provenance chain for dynamically spawned agents per AAC-AO-60. The created agent operates at or below its creator's trust tier \u2014 it may not be assigned a tier exceeding the creator's tier at spawn time. Equal-tier spawning requires explicit TIER_ASSIGNMENT authorization.",
+      "type": "object",
+      "properties": {
+        "parent_id": {
+          "description": "Spawning agent ID. Null for root agents deployed by a governance initialization process.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "depth": {
+          "description": "Current spawning depth. Requests at or beyond system_constraints.max_chain_depth are rejected.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "inherited_covenant_scope": {
+          "description": "Covenant subset inherited from the parent. Must be a strict subset. Equal-tier spawning requires explicit TIER_ASSIGNMENT authorization from an OG-28 principal.",
+          "type": "string"
+        },
+        "creator_trust_tier_at_spawn": {
+          "description": "Trust tier of the spawning agent at spawn time. Created agent may not exceed this tier.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "equal_tier_authorization_ref": {
+          "description": "If created agent has same tier as creator: reference to the OG-28 TIER_ASSIGNMENT authorization.",
+          "type": "string"
+        },
+        "ttl_seconds": {
+          "description": "Maximum lifetime of this spawned agent. Decommissioned automatically on expiry per AAC-AO-60.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "provenance_signature": {
+          "description": "Cryptographic signature of the full lineage chain. Verified by the enforcement boundary before any action is permitted.",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "definitions": {
+    "principal_id_ref": {
+      "description": "Reference to a principal declared in authority_registry.principals.",
+      "type": "string"
+    },
+    "fallback_id_ref": {
+      "description": "Reference to a fallback action declared in fallback_registry.",
+      "type": "string"
+    },
+    "agent_id_ref": {
+      "description": "Reference to an agent declared in agent_registry.",
+      "type": "string"
+    },
+    "integration_id_ref": {
+      "description": "Reference to an integration declared in integration_registry.",
+      "type": "string"
+    }
+  },
+  "allOf": [
+    {
+      "description": "L2 \u2014 Mature: additional required fields when maturity_level is L2 or L3.",
+      "if": {
+        "properties": {
+          "metadata": {
+            "properties": {
+              "maturity_level": {
+                "enum": [
+                  "L2",
+                  "L3"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "behavioral_envelopes"
+        ],
+        "properties": {
+          "system_constraints": {
+            "required": [
+              "max_synchronous_resolution_ms",
+              "max_asynchronous_escalation_ms",
+              "max_escalation_depth",
+              "escalation_hierarchy",
+              "safe_mode",
+              "cyclical_interaction",
+              "performance_monitoring_window_seconds",
+              "trust_metadata_ttl_seconds"
+            ],
+            "properties": {
+              "safe_mode": {
+                "required": [
+                  "entry_thresholds",
+                  "recovery_thresholds",
+                  "min_dwell_seconds",
+                  "max_flap_count",
+                  "flap_window_seconds",
+                  "hard_shutdown"
+                ]
+              }
+            }
+          },
+          "harm_classification": {
+            "properties": {
+              "taxonomy_review_cadence": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Required at L2 \u2014 how frequently the harm taxonomy is reviewed per AAC-OG-24."
+              }
+            },
+            "required": [
+              "tier_definitions",
+              "pre_classified_actions",
+              "foreseeable_harm_signals",
+              "taxonomy_review_cadence"
+            ]
+          },
+          "behavioral_envelopes": {
+            "minItems": 1,
+            "description": "Required at L2 \u2014 at least one behavioral envelope must be declared."
+          }
+        }
+      }
+    },
+    {
+      "description": "L3 \u2014 Optimizing: additional required fields when maturity_level is L3.",
+      "if": {
+        "properties": {
+          "metadata": {
+            "properties": {
+              "maturity_level": {
+                "const": "L3"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "behavioral_envelopes",
+          "model_registry",
+          "agent_lineage"
+        ],
+        "properties": {
+          "system_constraints": {
+            "required": [
+              "max_synchronous_resolution_ms",
+              "max_asynchronous_escalation_ms",
+              "max_escalation_depth",
+              "escalation_hierarchy",
+              "safe_mode",
+              "cyclical_interaction",
+              "performance_monitoring_window_seconds",
+              "trust_metadata_ttl_seconds",
+              "max_chain_depth"
+            ]
+          },
+          "model_registry": {
+            "minItems": 1,
+            "items": {
+              "required": [
+                "model_id",
+                "model_type",
+                "model_version",
+                "recovery",
+                "authorization"
+              ],
+              "properties": {
+                "authorization": {
+                  "required": [
+                    "authorized_by",
+                    "authorization_date",
+                    "intended_use_scope",
+                    "harm_tier_ceiling",
+                    "residual_risk_acceptance",
+                    "reevaluation_conditions"
+                  ],
+                  "description": "Full authorization record required at L3 per AAC-ZT-78."
+                }
+              }
+            }
+          },
+          "harm_classification": {
+            "properties": {
+              "foreseeable_harm_signals": {
+                "minItems": 5,
+                "description": "L3 requires comprehensive signal coverage \u2014 minimum 5 signals."
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
