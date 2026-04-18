@@ -54,33 +54,38 @@ Each level subsumes the previous. An L2 deployment satisfies all L1 requirements
 
 ```
 autonomous-agentic-covenant/
-├── README.md                                      <- this file
-├── LICENSE                                        <- Apache 2.0
-├── CHANGELOG.md                                   <- version history
+├── README.md                                     <- this file
+├── LICENSE                                       <- Apache 2.0
+├── CONTRIBUTING.md                               
+├── CODE_OF_CONDUCT.md                            
+├── SECURITY.md                                   <- security
+├── CHANGELOG.md                                  <- version history
+├── NOTICE                                       
 ├── covenant/
-│   ├── AAC_v2.0.md                               <- primary specification (current)
+│   ├── Autonomous_Agentic_Covenant_v2.0.md       <- primary specification (current)
 │   └── AAC_v1.3.md                               <- prior version (reference)
 ├── profiles/
 │   ├── AAC_Implementation_Profile_L1_v2.0.md     <- L1 Foundational template
 │   └── AAC_Implementation_Profile_L2L3_v2.0.md   <- L2 and L3 Annexes
-├── schema/
-│   ├── aac_v2.0_schema.json                      <- JSON Schema (maturity-aware)
-│   └── aac_v2.0_instance_fsi.json                <- FSI reference instance (L1)
-├── crosswalk/
-│   ├── AAC_Framework_Crosswalk_v2.0.md           <- CSA ATF / OWASP / NIST mapping
-│   └── AAC_ATLAS_Crosswalk_v2.0.md               <- MITRE ATLAS threat mitigation mapping
-│   └── AAC_EU_AI_Act_Crosswalk_v2.0.md           <- EU AI Act 2026 mapping
-└── governance/
-    └── CONTRIBUTING.md                            <- contribution process
+├── governance/
+│   ├── samples/                     
+│   │    └── AAC-v2.0-instance fsi.json           <- FSI reference instance (L1)
+│   └── schemas/
+│         └── covenant-v2.json                    <- JSON Schema (maturity-aware)
+└── crosswalk/
+    ├── AAC_Framework_Crosswalk_v2.0.md           <- CSA ATF / OWASP / NIST mapping
+    └── AAC_ATLAS_Crosswalk_v2.0.md               <- MITRE ATLAS threat mitigation mapping
+    └── AAC_EU_AI_Act_Crosswalk_v2.0.md           <- EU AI Act 2026 mapping
+
 ```
 
 **`covenant/`** — The framework specification. Start here. v1.3 is retained for organizations that have mapped compliance programs to prior identifiers — all v1.3 control identifiers that survive into v2.0 retain their original IDs.
 
 **`profiles/`** — Two-document Implementation Profile set. The L1 document covers all Foundational parameters and can be completed independently. The L2/L3 Annexes extend it for Mature and Optimizing deployments. Both include a financial services worked example and a governance sign-off block.
 
-**`schema/`** — Machine-readable schema and reference instance. The JSON Schema uses draft-07 `if-then` conditionals to enforce maturity-level-specific requirements based on `metadata.maturity_level`. A single schema serves all three maturity levels.
+**`governance/`** — Machine-readable schema and reference instance. The JSON Schema uses draft-07 `if-then` conditionals to enforce maturity-level-specific requirements based on `metadata.maturity_level`. A single schema serves all three maturity levels.
 
-**`crosswalk/`** — Two crosswalk documents serving distinct purposes. The Framework Crosswalk is a governance-to-governance alignment exercise. The ATLAS Crosswalk is a threat modeling instrument.
+**`crosswalk/`** — Three crosswalk documents serving distinct purposes. The Framework and EU Crosswalks are a governance-to-governance alignment exercise. The ATLAS Crosswalk is a threat modeling instrument.
 
 ---
 
@@ -88,7 +93,7 @@ autonomous-agentic-covenant/
 
 ### Path 1 — Read the specification
 
-Start with [`covenant/AAC_v2.0.md`](covenant/AAC_v2.0.md). The domain index links to each domain section. Every principle has a stable anchor (e.g. `#aac-zt-64`) for direct reference in ADRs, tickets, and documentation.
+Start with [`covenant/Autonomous_Agentic_Covenant_v2.0.md`](covenant/Autonomous_Agentic_Covenant_v2.0.md). The domain index links to each domain section. Every principle has a stable anchor (e.g. `#aac-zt-64`) for direct reference in ADRs, tickets, and documentation.
 
 ### Path 2 — Deploy a system against it
 
@@ -98,7 +103,7 @@ Start with [`covenant/AAC_v2.0.md`](covenant/AAC_v2.0.md). The domain index link
 
 **Step 3:** If declaring L2 or L3, complete [`profiles/AAC_Implementation_Profile_L2L3_v2.0.md`](profiles/AAC_Implementation_Profile_L2L3_v2.0.md) as a companion.
 
-**Step 4:** Instantiate the governance configuration using [`schema/aac_v2.0_schema.json`](schema/aac_v2.0_schema.json). The FSI reference instance at [`schema/aac_v2.0_instance_fsi.json`](schema/aac_v2.0_instance_fsi.json) demonstrates a complete L1 deployment.
+**Step 4:** Instantiate the governance configuration using [`governance/schemas/covenant_v2.json`](governance/schemas/covenant_v2.json). The FSI reference instance at [`governance/samples/aac_v2.0_instance_fsi.json`](governance/samples/aac_v2.0_instance_fsi.json) demonstrates a complete L1 deployment.
 
 **Step 5:** Get the Implementation Profile signed by the OG-28 authority declared in the Authority Registry. The governance control plane may not initialize against an unsigned profile.
 
@@ -108,11 +113,12 @@ Start with [`covenant/AAC_v2.0.md`](covenant/AAC_v2.0.md). The domain index link
 
 | Framework | Coverage |
 |---|---|
-| CSA Agentic Trust Framework (ATF) | 27 Full · 18 Partial · 11 Gap |
-| OWASP Agentic Top 10 (2026) | 9/10 Full · 1 Partial |
-| NIST AI RMF 1.0 | 18 Full · 5 Partial · 1 Gap |
+| CSA Agentic Trust Framework (ATF) | 17 Full · 4 Partial · 0 Gap |
+| OWASP Agentic Top 10 (2026) | 9 Full · 1 Partial · 0 Gap |
+| NIST AI RMF 1.0 | 20 Full · 9 Partial · 1 Gap |
+| EU AI Act 2024 | 14 Full · 12 Partial ·  8 Process Gap · 3 Gap |
 
-**Threat modeling** — [`crosswalk/AAC_ATLAS_Crosswalk_v1.0.docx`](crosswalk/AAC_ATLAS_Crosswalk_v1.0.docx): AAC controls mapped to MITRE ATLAS v5.4.0 adversarial techniques across all 16 tactics.
+**Threat modeling** — [`crosswalk/AAC_ATLAS_Crosswalk_v2.0.md`](crosswalk/AAC_ATLAS_Crosswalk_v2.0.md): AAC controls mapped to MITRE ATLAS v5.4.0 adversarial techniques across all 16 tactics.
 
 ---
 
@@ -142,7 +148,7 @@ Control identifiers are stable within a major version. Every v1.3 identifier tha
 
 ## Key Design Decisions
 
-**Why DNH is an architectural invariant, not a priority**
+**Why DNH is an architectural invariant, not a policy**
 The Do No Harm domain operates as an override constraint. Any principle in any other domain that would produce a DNH violation is automatically subordinated regardless of operational pressure or business justification. No optimization objective — revenue, cost, performance, or throughput — may override a harm tier classification.
 
 **Why the framework is stateless**
@@ -183,12 +189,12 @@ The following AAC principles have no direct equivalent in CSA ATF, OWASP Agentic
 
 | Framework | Relationship |
 |---|---|
-| MITRE ATLAS v5.4.0 | Direct dependency — specific principles close named ATLAS technique gaps |
-| OWASP Agentic Top 10 (2026) | Direct dependency — ZT-77 closes ASI04; RS-36 maps to ASI-09 |
-| EU AI Act (Regulation (EU) 2024/1689) | Regulatory dependency — ZT-76 (Art. 52), ZT-78 (Arts. 10, 53), DP-06 (Art. 10) |
-| NIST AI RMF 1.0 | Alignment — 18 Full, 5 Partial, 1 Gap |
-| CSA Agentic Trust Framework | Alignment — 27 Full, 18 Partial, 11 Gap |
-| STRIDE | Methodological — DA-64 uses STRIDE for harm taxonomy construction guidance |
+| MITRE ATLAS v5.4.0 | specific principles close ATLAS technique gaps |
+| OWASP Agentic Top 10 (2026) | ZT-77 closes ASI04; RS-36 maps to ASI-09 |
+| EU AI Act (Regulation (EU) 2024/1689) | ZT-76 (Art. 52), ZT-78 (Arts. 10, 53), DP-06 (Art. 10) |
+| NIST AI RMF 1.0 | Mapping — 18 Full, 5 Partial, 1 Gap |
+| CSA Agentic Trust Framework | Mapping —  27 Full, 18 Partial, 11 Gap |
+| STRIDE | DA-64 uses STRIDE for harm taxonomy construction guidance |
 
 ---
 
@@ -212,6 +218,6 @@ Contributed code (policy gate scripts, validators, test harnesses) is licensed u
 
 ## Author
 
-**Raj Thakuri** — CISO, independent researcher, and practitioner at the intersection of AI security, privacy-first architecture, and AI governance. Developed from operational experience designing governance structures for agentic AI systems in regulated enterprise environments. All views are my own.
+**Raj Thakuri** — Independent researcher, and cybersecurity practitioner at the intersection of AI security, privacy-first architecture, and AI governance. All views are his own.
 
 *Questions, citations, and implementation reports welcome via GitHub Issues.*
