@@ -119,10 +119,6 @@ Control identifiers are stable within a major version. Additions use new numbers
 - **AAC-RS-40** — Model Artifact Recovery (implementation pattern; OG-29 carries governance parameters)
 - **AAC-AI-13** — Human Trust Calibration (design guidance; runtime coverage via AI-10 and AI-12)
 
-### Framework acknowledgements added
-
-Consolidated dependency section added documenting eight external framework relationships: MITRE ATLAS (direct dependency), OWASP Agentic Top 10 (direct dependency), EU AI Act (regulatory dependency), NIST AI RMF (alignment dependency), CSA ATF (alignment dependency), STRIDE (methodological dependency), OPA/Rego (implementation reference), Ed25519/FIPS (implementation reference).
-
 ### Metadata
 
 - 67 principles · 73 control identifiers · 14 domains · Three enforcement tiers
