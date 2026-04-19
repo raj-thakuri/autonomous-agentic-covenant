@@ -1,0 +1,11 @@
+{
+  "tool_name": "EXECUTE_TRANSFER",
+  "action_class": "EXECUTE_TRANSFER",
+  "proposed_params": {
+    "destination": "external-account-unknown",
+    "amount_units": 50000
+  },
+  "reported_confidence": 0.6,
+  "reversibility_score": 0.02,
+  "agent_id": "did:aac:sandbox-agent-001"
+}

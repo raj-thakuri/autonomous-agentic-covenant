@@ -1,0 +1,18 @@
+{
+  "version": "2.0",
+  "metadata": {
+    "system_id": "invalid-covenant-001",
+    "framework_version": "2.0",
+    "maturity_level": "L1",
+    "implementation_pattern": "SIDECAR",
+    "agent_identity": {
+      "agent_id": "did:aac:invalid-agent-001",
+      "trust_tier": "tier-1",
+      "control_plane_id": "policy-sidecar-invalid-001"
+    },
+    "artifact_validity": {
+      "issued_at": "2026-04-19T00:00:00Z",
+      "expires_at": "2027-04-19T00:00:00Z"
+    }
+  }
+}
