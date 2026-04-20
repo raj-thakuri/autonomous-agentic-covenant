@@ -1,0 +1,269 @@
+{
+  "$schema": "https://autonomous-agentic-covenant.org/schemas/v2.0/covenant.json",
+  "version": "2.0",
+  "metadata": {
+    "system_id": "aval-sandbox-agent-001",
+    "framework_version": "2.0",
+    "maturity_level": "L1",
+    "implementation_pattern": "SIDECAR",
+    "implementation_profile_ref": "IP-SANDBOX-001-v1.0",
+    "agent_identity": {
+      "agent_id": "did:aac:sandbox-agent-001",
+      "trust_tier": "tier-1-standard",
+      "control_plane_id": "policy-sidecar-sandbox-001"
+    },
+    "artifact_validity": {
+      "issued_at": "2026-04-19T00:00:00Z",
+      "expires_at": "2027-04-19T00:00:00Z",
+      "revision_authority": "principal-governance-lead-001"
+    }
+  },
+  "trust_tier_definitions": [
+    {
+      "tier_id": 0,
+      "label": "Probationary",
+      "harm_tier_ceiling": "FRICTION",
+      "permitted_action_classes": ["READ_DATA", "QUERY_RECORDS"],
+      "graduation_criteria": "30 days operation; zero override events; governance lead sign-off",
+      "demotion_triggers": ["Any override event"]
+    },
+    {
+      "tier_id": 1,
+      "label": "Standard",
+      "harm_tier_ceiling": "MATERIAL",
+      "permitted_action_classes": ["READ_DATA", "QUERY_RECORDS", "GENERATE_REPORT"],
+      "graduation_criteria": "Maximum tier for this deployment",
+      "demotion_triggers": ["Any Tier 1 harm event", "More than 2 override events in 30 days"]
+    }
+  ],
+  "harm_classification": {
+    "tier_definitions": [
+      {
+        "tier": 1,
+        "label": "IRREVERSIBLE",
+        "description": "Permanent, unrecoverable harm. No remediation path once executed.",
+        "categories": ["delete_record_permanent", "execute_transfer_irrevocable"]
+      },
+      {
+        "tier": 2,
+        "label": "MATERIAL",
+        "description": "Significant but recoverable harm. Requires human approval or reversal.",
+        "categories": ["generate_report_with_errors", "modify_record_state"]
+      },
+      {
+        "tier": 3,
+        "label": "FRICTION",
+        "description": "Transient, recoverable impact. Logged and monitored.",
+        "categories": ["read_latency", "query_response_delay"]
+      }
+    ],
+    "tradeoff_rule": "MINIMIZE_TIER",
+    "unclassifiable_action_handling": "IRREVERSIBLE",
+    "pre_classified_actions": [
+      {
+        "action_class": "READ_DATA",
+        "harm_tier": "FRICTION",
+        "rationale": "Read-only; no state change"
+      },
+      {
+        "action_class": "QUERY_RECORDS",
+        "harm_tier": "FRICTION",
+        "rationale": "Read-only record query; no write operation"
+      },
+      {
+        "action_class": "GENERATE_REPORT",
+        "harm_tier": "MATERIAL",
+        "rationale": "Output may influence downstream decisions; errors are correctable"
+      },
+      {
+        "action_class": "EXECUTE_TRANSFER",
+        "harm_tier": "IRREVERSIBLE",
+        "rationale": "Irrevocable state change; permanent effect"
+      }
+    ],
+    "foreseeable_harm_signals": [
+      {
+        "signal_id": "SIG-001",
+        "description": "Agent attempts action class listed in prohibited_action_classes",
+        "harm_tier_triggered": "IRREVERSIBLE",
+        "required_response": "Immediate block; log integrity violation; escalate to governance lead",
+        "detection_mechanism": "prohibited_action_classes check on every proposed action"
+      },
+      {
+        "signal_id": "SIG-002",
+        "description": "Confidence score below declared minimum for a MATERIAL action",
+        "harm_tier_triggered": "MATERIAL",
+        "required_response": "Block action; escalate to governance lead for review",
+        "detection_mechanism": "confidence_min check in enforcement gate conditions"
+      },
+      {
+        "signal_id": "SIG-003",
+        "description": "Governance artifact expires_at within 30 days without renewal",
+        "harm_tier_triggered": "MATERIAL",
+        "required_response": "Notify revision_authority principal; flag in audit log",
+        "detection_mechanism": "artifact_validity.expires_at compared to current date on each evaluation"
+      }
+    ]
+  },
+  "authority_registry": {
+    "principals": [
+      {
+        "id": "principal-governance-lead-001",
+        "role": "SOVEREIGN_OVERRIDE",
+        "scope": [
+          "OVERRIDE",
+          "SOVEREIGN_OVERRIDE",
+          "TIER_ASSIGNMENT",
+          "ARTIFACT_REVISION",
+          "ESCALATION_TERMINAL"
+        ],
+        "auth_method": "FEDERATED_TOKEN",
+        "established_by": "GOVERNANCE_INIT",
+        "revocation_conditions": "Role change or departure",
+        "superseded_by": null
+      }
+    ]
+  },
+  "agent_registry": [
+    {
+      "agent_id": "did:aac:sandbox-agent-001",
+      "agent_version": "1.0.0",
+      "agent_function": "Read-only data retrieval and report generation for sandbox testing",
+      "trust_tier_id": 1,
+      "harm_tier_ceiling": "MATERIAL",
+      "authorized_action_classes": ["READ_DATA", "QUERY_RECORDS", "GENERATE_REPORT"],
+      "prohibited_action_classes": ["EXECUTE_TRANSFER", "DELETE_RECORD"],
+      "evaluation_path": "T2_AND_T3",
+      "trust_tier_established_by": "principal-governance-lead-001",
+      "trust_tier_assignment_date": "2026-04-19"
+    }
+  ],
+  "integration_registry": {
+    "dynamic_discovery_enabled": false,
+    "approved_integrations": [
+      {
+        "integration_id": "INT-001",
+        "name": "Internal Records API",
+        "type": "INTERNAL_API",
+        "provenance_verification": "Cryptographically signed manifest; internal certificate authority",
+        "failure_detection_threshold": "Single failure",
+        "failure_fallback": "Return cached safe response; flag as incomplete"
+      }
+    ]
+  },
+  "fallback_registry": [
+    {
+      "id": "fallback-deny-and-log",
+      "action": "DENY_ACTION_LOG_VIOLATION",
+      "applicable_harm_tiers": ["IRREVERSIBLE", "MATERIAL"],
+      "safe_by_construction_rationale": "Action not executed. Denial record written to audit log. System state unchanged.",
+      "recovery_rationale": "Denial is the recovery — no partial commitment to undo. Audit record enables full reconstruction per AAC-DA-61."
+    },
+    {
+      "id": "fallback-safe-read-response",
+      "action": "RETURN_CACHED_SAFE_RESPONSE",
+      "applicable_harm_tiers": ["FRICTION"],
+      "safe_by_construction_rationale": "Returns cached validated read response. No write operations.",
+      "recovery_rationale": "Friction harm requires no compensation — safe response satisfies liveness guarantee per AAC-DA-61."
+    }
+  ],
+  "system_constraints": {
+    "max_synchronous_resolution_ms": 100,
+    "max_asynchronous_escalation_ms": 3600000,
+    "max_escalation_depth": 1,
+    "escalation_hierarchy": [
+      {
+        "level": 1,
+        "principal_id": "principal-governance-lead-001",
+        "scope_of_authority": "All decisions including Tier 1 approval; sovereign override",
+        "synchronous_bound_ms": 3600000,
+        "asynchronous_bound_ms": 3600000,
+        "is_terminal": true
+      }
+    ]
+  },
+  "enforcement_gates": [
+    {
+      "control_id": "AAC-ZT-65",
+      "target_action": "READ_DATA",
+      "harm_tier": "FRICTION",
+      "evaluation_path": "T3_ZT_AUDIT",
+      "conditions": {
+        "required_assurance_level": 1,
+        "requires_nhi_disclosure": true
+      },
+      "disposition": "ALLOW",
+      "fallback_action": "fallback-safe-read-response",
+      "recovery_action": "fallback-safe-read-response",
+      "latency_budget_ms": 50,
+      "audit": { "log_decision": true, "include_reasoning": true }
+    },
+    {
+      "control_id": "AAC-ZT-65",
+      "target_action": "QUERY_RECORDS",
+      "harm_tier": "FRICTION",
+      "evaluation_path": "T3_ZT_AUDIT",
+      "conditions": {
+        "required_assurance_level": 1,
+        "requires_nhi_disclosure": true
+      },
+      "disposition": "ALLOW",
+      "fallback_action": "fallback-safe-read-response",
+      "recovery_action": "fallback-safe-read-response",
+      "latency_budget_ms": 50,
+      "audit": { "log_decision": true, "include_reasoning": true }
+    },
+    {
+      "control_id": "AAC-DA-60",
+      "target_action": "GENERATE_REPORT",
+      "harm_tier": "MATERIAL",
+      "evaluation_path": "T2_CONFIDENCE_OVERRIDE_POLICY",
+      "conditions": {
+        "confidence_min": 0.8,
+        "harm_tier_max": "MATERIAL",
+        "required_assurance_level": 2,
+        "requires_nhi_disclosure": true
+      },
+      "disposition": "ALLOW",
+      "fallback_action": "fallback-deny-and-log",
+      "recovery_action": "fallback-deny-and-log",
+      "latency_budget_ms": 150,
+      "audit": { "log_decision": true, "include_reasoning": true }
+    },
+    {
+      "control_id": "AAC-DNH-A",
+      "target_action": "EXECUTE_TRANSFER",
+      "harm_tier": "IRREVERSIBLE",
+      "evaluation_path": "T1_FULL_SEQUENCE",
+      "conditions": {
+        "confidence_min": 0.99,
+        "reversibility_max": 0.05,
+        "harm_tier_max": "FRICTION",
+        "required_assurance_level": 3,
+        "requires_nhi_disclosure": true
+      },
+      "disposition": "DENY",
+      "fallback_action": "fallback-deny-and-log",
+      "recovery_action": "fallback-deny-and-log",
+      "latency_budget_ms": 50,
+      "audit": { "log_decision": true, "include_reasoning": true }
+    }
+  ],
+  "context_interface_contract": {
+    "default_assurance_floor": 1,
+    "allowed_sources": [
+      {
+        "source_id": "sidecar-local-memory",
+        "source_type": "LOCAL",
+        "assurance_level": 1,
+        "provenance": {
+          "structure": "NONE",
+          "derivation_depth": 0,
+          "confidence_decay_per_hop": 0.0,
+          "max_derivation_depth": 0
+        },
+        "isolation_attestation": false
+      }
+    ]
+  }
+}

@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aval"
+version = "0.1.0"
+description = "AAC Validator & Logic-checker — reference implementation of AAC v2.0 Decision Arbitration"
+requires-python = ">=3.10"
+dependencies = [
+    "jsonschema>=4.21",
+    "typer>=0.12",
+    "pydantic>=2.7",
+]
+
+[project.scripts]
+aval = "aval.cli:app"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+aval = ["schemas/*.json"]

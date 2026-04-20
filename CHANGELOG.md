@@ -6,6 +6,22 @@ Control identifiers are stable within a major version. Additions use new numbers
 
 ---
 
+## AVAL Toolkit v0.1.0 — April 2026
+
+First code layer on the repository. AVAL (AAC Validator & Logic-checker) is a pip-installable Python CLI that implements AAC v2.0 Decision Arbitration (DA-59 to DA-63) as a deterministic reference enforcement engine. Located at `toolkit/`. Requires Python 3.10+.
+
+**`aval lint`** — Three-layer validation: JSON syntax, draft-07 schema compliance (maturity-aware conditionals enforced), and artifact integrity checks — `expires_at` against current date (AAC-OG-24) and `revision_authority` verified as a declared principal in `authority_registry` (AAC-OG-28). CI/CD-compatible exit codes.
+
+**`aval profile`** — Reads a `covenant.json` and outputs a Maturity Grade (L1/L2/L3) showing which AAC governance controls are populated and whether the file satisfies its declared maturity level. Reports populated controls and missing required controls with their AAC identifiers.
+
+**`aval simulate`** — Deterministic DA-60 arbitration engine. Routes proposed actions through evaluation paths determined by harm tier: T3\_ZT\_AUDIT (FRICTION), T2\_CONFIDENCE\_OVERRIDE\_POLICY (MATERIAL), T1\_FULL\_SEQUENCE (IRREVERSIBLE). Produces a per-step Governance Trace (AAC-DP-07) covering agent registry (DA-63), prohibited action check (DA-63), agent authorization (DA-63), integration registry (ZT-77), harm classification (DA-59), confidence verification (DA-62), reversibility scoring (DA-60), sovereignty override (OG-28), and policy constraints (AO-58). `--json` flag for machine-readable output.
+
+**`demos/gate-viewer/aac_gate_viewer.html`** — Standalone HTML visualization of the AAC multi-agent gate logic. Self-contained, no dependencies. Uses a TransactIQ FSI scenario to demonstrate the full T1/T2/T3 evaluation paths interactively.
+
+**`toolkit/GUIDE.md`** — Step-by-step deployment and usage guide covering installation, all three commands with worked examples referencing the included test fixtures, action file format, evaluation path reference, disposition table, and governance trace control mapping.
+
+---
+
 ## Companion Documents — April 2026
 
 **AAC v2.0 Implementation Profile Template — L1 Foundational** — New companion document. Annotated Markdown template covering all L1 required parameters with a financial services worked example (TransactIQ Payment Risk Assessment Agent). Seven governance concern groups: harm governance, arbitration governance, authority and accountability, trust and autonomy, agent behavioral governance, integration governance, and model governance. Includes completion checklist and governance sign-off block. Located at `AAC_Implementation_Profile_L1_v2.0.md`.
