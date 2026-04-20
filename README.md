@@ -73,9 +73,9 @@ autonomous-agentic-covenant/
 │   └── schemas/
 │         └── covenant-v2.json                    <- JSON Schema (maturity-aware)
 ├── crosswalk/
-│   ├── AAC_Framework_Crosswalk_v2.0.md           <- CSA ATF / OWASP / NIST mapping
+│   ├── AAC_Framework_Crosswalk_v2_0.md           <- CSA ATF / OWASP / NIST mapping
 │   ├── AAC_ATLAS_Crosswalk_v2.0.md               <- MITRE ATLAS threat mitigation mapping
-│   └── AAC_EU_AI_Act_Crosswalk_v2.0.md           <- EU AI Act 2026 mapping
+│   └── AAC_EU_AI_Act_Crosswalk_v2_0.md           <- EU AI Act 2026 mapping
 ├── toolkit/
 │   ├── src/aval/                                 <- AVAL Python package (pip install -e .)
 │   ├── test_suite/                               <- lint, profile, simulate fixtures
@@ -121,7 +121,7 @@ Start with [`covenant/Autonomous_Agentic_Covenant_v2.0.md`](covenant/Autonomous_
 
 ### Path 3 — Map to your existing frameworks
 
-**Governance alignment** — [`crosswalk/AAC_Framework_Crosswalk_v2.0.md`](crosswalk/AAC_Framework_Crosswalk_v2.0.md):
+**Governance alignment** — [`crosswalk/AAC_Framework_Crosswalk_v2_0.md`](crosswalk/AAC_Framework_Crosswalk_v2_0.md):
 
 | Framework | Coverage |
 |---|---|

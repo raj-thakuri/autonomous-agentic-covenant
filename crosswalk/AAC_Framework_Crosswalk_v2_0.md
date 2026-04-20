@@ -142,7 +142,7 @@ Every agent request is independently authenticated and authorized per **AAC-ZT-6
 
 #### ATF-5.3 — Compliance and Regulatory Alignment | **Partial**
 
-**AAC-OG-24** (Governance as Code) requires all governance artifacts to be version-controlled, validity-bounded, and CI/CD integrated — the operational infrastructure for regulatory compliance. **AAC-OG-29** (Implementation Profile) formalizes the deployment-specific compliance parameterization. **AAC-ZT-76** addresses EU AI Act Article 52 transparency. The AAC does not prescribe specific regulatory frameworks — it provides the governance control plane infrastructure that regulatory compliance is built on. Organizations must map their specific regulatory obligations to AAC parameters in the Implementation Profile.
+**AAC-OG-24** (Governance as Code) requires all governance artifacts to be version-controlled, validity-bounded, and CI/CD integrated — the operational infrastructure for regulatory compliance. **AAC-OG-29** (Implementation Profile) formalizes the deployment-specific compliance parameterization. **AAC-ZT-76** addresses EU AI Act Article 50 transparency. The AAC does not prescribe specific regulatory frameworks — it provides the governance control plane infrastructure that regulatory compliance is built on. Organizations must map their specific regulatory obligations to AAC parameters in the Implementation Profile.
 
 ---
 
@@ -316,7 +316,7 @@ The NIST AI RMF 1.0 provides a strategic risk management structure organized aro
 
 #### GOVERN 1.1 — Legal and Regulatory Requirements | **Partial**
 
-**AAC-OG-24** (Governance as Code) requires governance artifacts to be version-controlled, validity-bounded, and maintained with the same rigor as production code — the operational infrastructure for regulatory compliance. **AAC-OG-29** (Implementation Profile) formalizes deployment-specific regulatory parameterization. **AAC-ZT-76** addresses EU AI Act Article 52 transparency obligations. The gap: the AAC does not prescribe specific regulatory frameworks or require regulatory compliance mapping — organizations must populate the Implementation Profile's `regulatory_context` field and complete their own compliance mapping. The AAC provides the governance control plane; regulatory compliance requires organizational policy layer on top.
+**AAC-OG-24** (Governance as Code) requires governance artifacts to be version-controlled, validity-bounded, and maintained with the same rigor as production code — the operational infrastructure for regulatory compliance. **AAC-OG-29** (Implementation Profile) formalizes deployment-specific regulatory parameterization. **AAC-ZT-76** addresses EU AI Act Article 50 transparency obligations. The gap: the AAC does not prescribe specific regulatory frameworks or require regulatory compliance mapping — organizations must populate the Implementation Profile's `regulatory_context` field and complete their own compliance mapping. The AAC provides the governance control plane; regulatory compliance requires organizational policy layer on top.
 
 ---
 

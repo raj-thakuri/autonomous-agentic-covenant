@@ -124,7 +124,7 @@ Article 12 requires high-risk AI systems to automatically log events throughout 
 ---
 
 ### Article 13 — Transparency and Provision of Information
-**⚠️ In force:** August 2026 (for high-risk systems; Article 52 already in force)
+**⚠️ In force:** August 2026 (high-risk systems and Article 50 transparency obligations)
 **Applicability:** High-risk AI systems
 
 Article 13 requires high-risk AI systems to be designed and developed with sufficient transparency to enable deployers to use them correctly, and to include information enabling informed decision-making.
@@ -135,7 +135,7 @@ Article 13 requires high-risk AI systems to be designed and developed with suffi
 | 13(2): Instructions of use to deployers | **Partial** | OG-29, OG-24 | The Implementation Profile and governance documentation serve as deployer instructions. Partial: Article 13(2) specifies a minimum content set for instructions of use (Annex IV §2(d)) that includes intended use limitations, performance metrics, known limitations, and human oversight requirements. The Implementation Profile covers most of this but must be formatted as instructions of use. |
 | 13(3)(b): Identity and contact of provider | **Process Gap** | — | Provider identification is an organizational and regulatory requirement — not addressable by the governance control plane. |
 | 13(3)(d): Characteristics, capabilities, and limitations | **Partial** | OG-29, TB-29, DA-59 | **AAC-OG-29** declares capabilities through the agent registry and behavioral envelopes. **AAC-TB-29** (Behavioral Envelope) formalizes capabilities and limitations. **AAC-DA-59** (Harm Classification) declares the harm taxonomy as a limitation structure. Partial: Article 13(3)(d) requires specific performance metrics and accuracy levels in a format suitable for deployer decision-making. |
-| 52(1): Transparency for AI systems interacting with natural persons | **Satisfies** | ZT-76 | **AAC-ZT-76** (Non-Human Identity Disclosure) directly satisfies Article 52(1) — every outbound request discloses agent identity, trust tier, and control plane ID. At L3, non-processing destinations that might assume human identity receive elevated harm tier classification triggering additional disclosure. **Already in force — February 2025.** |
+| 50(1): Transparency for AI systems interacting with natural persons | **Satisfies** | ZT-76 | **AAC-ZT-76** (Non-Human Identity Disclosure) directly satisfies Article 50(1) — every outbound request discloses agent identity, trust tier, and control plane ID. At L3, non-processing destinations that might assume human identity receive elevated harm tier classification triggering additional disclosure. **In force: August 2026.** |
 
 ---
 
@@ -226,7 +226,7 @@ Article 15 requires high-risk AI systems to achieve appropriate levels of accura
 | Article 15 | Accuracy / Robustness / Cybersecurity | Satisfies | ⚠️ Aug 2026 |
 | Article 16 | Provider obligations | Partial + Process Gap | ⚠️ Aug 2026 |
 | Article 26 | Deployer obligations | Satisfies + Partial | ⚠️ Aug 2026 |
-| Article 52 | Transparency (AI identity) | Satisfies | No (Feb 2025) |
+| Article 50 | Transparency (AI identity) | Satisfies | ⚠️ Aug 2026 |
 | Articles 51–56 | GPAI obligations | Partial + Gap | No (Aug 2025) |
 
 ### Obligation Count
