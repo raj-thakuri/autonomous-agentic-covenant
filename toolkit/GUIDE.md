@@ -1,4 +1,4 @@
-aaa# AVAL — Deployment and Usage Guide
+# AVAL — Deployment and Usage Guide
 
 AAC Validator & Logic-checker v0.1.0  
 Reference implementation of AAC v2.0 Decision Arbitration (AAC-DA-59 to DA-63)

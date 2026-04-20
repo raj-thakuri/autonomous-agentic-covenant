@@ -115,13 +115,13 @@ Start with [`covenant/Autonomous_Agentic_Covenant_v2.0.md`](covenant/Autonomous_
 
 **Step 3:** If declaring L2 or L3, complete [`profiles/AAC_Implementation_Profile_L2L3_v2.0.md`](profiles/AAC_Implementation_Profile_L2L3_v2.0.md) as a companion.
 
-**Step 4:** Instantiate the governance configuration using [`governance/schemas/covenant_v2.json`](governance/schemas/covenant_v2.json). The FSI reference instance at [`governance/samples/aac_v2.0_instance_fsi.json`](governance/samples/aac_v2.0_instance_fsi.json) demonstrates a complete L1 deployment.
+**Step 4:** Instantiate the governance configuration using [`governance/schemas/covenant-v2.json`](governance/schemas/covenant-v2.json). The FSI reference instance at [`governance/samples/AAC-v2.0-instance fsi.json`](<governance/samples/AAC-v2.0-instance fsi.json>) demonstrates a complete L1 deployment.
 
 **Step 5:** Get the Implementation Profile signed by the OG-28 authority declared in the Authority Registry. The governance control plane may not initialize against an unsigned profile.
 
 ### Path 3 — Map to your existing frameworks
 
-**Governance alignment** — [`crosswalk/AAC_Framework_Crosswalk_v1.0.docx`](crosswalk/AAC_Framework_Crosswalk_v1.0.docx):
+**Governance alignment** — [`crosswalk/AAC_Framework_Crosswalk_v2.0.md`](crosswalk/AAC_Framework_Crosswalk_v2.0.md):
 
 | Framework | Coverage |
 |---|---|

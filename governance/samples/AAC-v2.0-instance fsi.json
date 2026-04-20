@@ -1,6 +1,6 @@
 {
   "$schema": "https://autonomous-agentic-covenant.org/schemas/v2.0/covenant.json",
-  "_comment": "AAC v2.0 Reference Instance \u2014 Financial Services Analytics Agent, L1 Foundational. Policy engine sidecar governing a LangGraph agent runtime. Satisfies all L1 required fields only. No L2/L3 optional fields. See AAC_v2.0_DRAFT.md for governing principles.",
+  "_comment": "AAC v2.0 Reference Instance \u2014 Financial Services Analytics Agent, L1 Foundational. Policy engine sidecar governing a LangGraph agent runtime. Satisfies all L1 required fields only. No L2/L3 optional fields. See Autonomous_Agentic_Covenant_v2.0.md for governing principles.",
   "version": "2.0",
   "metadata": {
     "system_id": "fsi-analytics-agent-mvp-001",

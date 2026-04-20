@@ -32,7 +32,7 @@ First code layer on the repository. AVAL (AAC Validator & Logic-checker) is a pi
 
 **AAC v2.0 FSI Reference Instance** (`aac_v2.0_instance_fsi.json`) — Updated to L1 Foundational compliance against the revised schema. Removed L2/L3 fields (safe_mode, cyclical_interaction, agent_lineage). Added all new required sections (trust_tier_definitions, agent_registry, integration_registry, foreseeable_harm_signals, pre_classified_actions, escalation_hierarchy). All nine enforcement gates now carry `harm_tier` and `evaluation_path` fields. Technology-neutral authentication and provenance terminology applied throughout. Validated against revised schema: 22/22 checks passed.
 
-**AAC MITRE ATLAS Threat Mitigation Crosswalk v1.0** — New companion document published alongside the framework. Maps AAC v1.3 controls to MITRE ATLAS v5.4.0 (16 tactics · 84 techniques · 56 sub-techniques). Structured differently from the governance crosswalk: coverage ratings reflect defensive effectiveness against adversarial techniques, not conceptual alignment with peer frameworks. Covers 30 technique mappings across all 16 ATLAS tactics. Identifies five gap areas — dynamic supply chain integrity (highest priority), model artifact recovery, output content integrity monitoring, adversarial benchmark specification, and passive OSINT reconnaissance — with recommended closure paths. Located at `crosswalk/AAC_ATLAS_Crosswalk_v1.0.docx`.
+**AAC MITRE ATLAS Threat Mitigation Crosswalk v2.0** — New companion document published alongside the framework. Maps AAC v2.0 controls to MITRE ATLAS v5.4.0 (16 tactics · 84 techniques · 56 sub-techniques). Structured differently from the governance crosswalk: coverage ratings reflect defensive effectiveness against adversarial techniques, not conceptual alignment with peer frameworks. Covers 30 technique mappings across all 16 ATLAS tactics. Identifies five gap areas — dynamic supply chain integrity (highest priority), model artifact recovery, output content integrity monitoring, adversarial benchmark specification, and passive OSINT reconnaissance — with recommended closure paths. Located at `crosswalk/AAC_ATLAS_Crosswalk_v2.0.md`.
 
 **Note on crosswalk scope:** The ATLAS crosswalk is a threat modeling instrument, not a governance alignment document. The two crosswalk documents in the `crosswalk/` directory serve distinct purposes and should be used accordingly. See README for guidance.
 
@@ -255,4 +255,4 @@ First code layer on the repository. AVAL (AAC Validator & Logic-checker) is a pi
 
 ---
 
-*The Autonomous Agentic Covenant is a living framework. Proposals for additions, modifications, or retirements are welcome via GitHub Issues. See [CONTRIBUTING.md](governance/CONTRIBUTING.md) for the proposal process.*
+*The Autonomous Agentic Covenant is a living framework. Proposals for additions, modifications, or retirements are welcome via GitHub Issues. See [CONTRIBUTING.md](CONTRIBUTING.md) for the proposal process.*
