@@ -81,6 +81,8 @@ autonomous-agentic-covenant/
 │   ├── test_suite/                               <- lint, profile, simulate fixtures
 │   ├── schemas/                                  <- covenant-v2.json (mirrored)
 │   └── GUIDE.md                                  <- deployment and usage guide
+├── cookbook/
+│   └── AAC_Governance_Cookbook_v1.0.md           <- six implementation patterns with AVAL traces
 └── demos/
     └── gate-viewer/
         └── aac_gate_viewer.html                  <- AAC Multi-Agent Gate Viewer (TransactIQ FSI)
