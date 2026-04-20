@@ -72,10 +72,18 @@ autonomous-agentic-covenant/
 │   │    └── AAC-v2.0-instance fsi.json           <- FSI reference instance (L1)
 │   └── schemas/
 │         └── covenant-v2.json                    <- JSON Schema (maturity-aware)
-└── crosswalk/
-    ├── AAC_Framework_Crosswalk_v2.0.md           <- CSA ATF / OWASP / NIST mapping
-    └── AAC_ATLAS_Crosswalk_v2.0.md               <- MITRE ATLAS threat mitigation mapping
-    └── AAC_EU_AI_Act_Crosswalk_v2.0.md           <- EU AI Act 2026 mapping
+├── crosswalk/
+│   ├── AAC_Framework_Crosswalk_v2.0.md           <- CSA ATF / OWASP / NIST mapping
+│   ├── AAC_ATLAS_Crosswalk_v2.0.md               <- MITRE ATLAS threat mitigation mapping
+│   └── AAC_EU_AI_Act_Crosswalk_v2.0.md           <- EU AI Act 2026 mapping
+├── toolkit/
+│   ├── src/aval/                                 <- AVAL Python package (pip install -e .)
+│   ├── test_suite/                               <- lint, profile, simulate fixtures
+│   ├── schemas/                                  <- covenant-v2.json (mirrored)
+│   └── GUIDE.md                                  <- deployment and usage guide
+└── demos/
+    └── gate-viewer/
+        └── aac_gate_viewer.html                  <- AAC Multi-Agent Gate Viewer (TransactIQ FSI)
 
 ```
 
@@ -86,6 +94,10 @@ autonomous-agentic-covenant/
 **`governance/`** — Machine-readable schema and reference instance. The JSON Schema uses draft-07 `if-then` conditionals to enforce maturity-level-specific requirements based on `metadata.maturity_level`. A single schema serves all three maturity levels.
 
 **`crosswalk/`** — Three crosswalk documents serving distinct purposes. The Framework and EU Crosswalks are a governance-to-governance alignment exercise. The ATLAS Crosswalk is a threat modeling instrument.
+
+**`toolkit/`** — AVAL (AAC Validator & Logic-checker) v0.1.0: a pip-installable Python CLI that implements AAC v2.0 Decision Arbitration (DA-59 to DA-63) as a reference enforcement engine. Three commands: `aval lint` (schema validation), `aval profile` (maturity grading), `aval simulate` (deterministic DA-60 arbitration with governance trace). See [`toolkit/GUIDE.md`](toolkit/GUIDE.md) for installation and usage.
+
+**`demos/`** — Standalone visualization artifacts. `gate-viewer/aac_gate_viewer.html` is a self-contained HTML demo of the AAC multi-agent gate logic using a TransactIQ FSI scenario.
 
 ---
 
